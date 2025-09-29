@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculateur Demi‑fond – VMA, % et Tours</title>
+  <style>
+    :root{
+      --bg:#f6f8fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+      --primary:#2563eb; --accent:#10b981; --warn:#f59e0b; --danger:#ef4444;
+      --radius:14px; --shadow:0 10px 30px rgba(2,6,23,.08);
+    }
+    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    body{margin:0;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
+    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
+    h1{font-size:clamp(20px,3vw,28px);margin:0}
+    .subtitle{color:var(--muted);font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    @media(min-width:900px){.card.half{grid-column:span 6}}
+    .card h2{font-size:18px;margin:0 0 8px}
+    .row{display:grid;grid-template-columns:160px 1fr 110px;gap:10px;align-items:center;margin:10px 0}
+    .row label{color:var(--muted);font-size:14px}
+    input[type="number"], input[type="text"], select{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+    .help{font-size:12px;color:var(--muted)}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    button{border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .primary{background:var(--primary);color:#fff}
+    .ghost{background:#eef2ff;color:#1e3a8a}
+    .accent{background:var(--accent);color:#052e1a}
+    .warn{background:#fff7ed;color:#9a3412}
+    .danger{background:#fee2e2;color:#7f1d1d}
+    .out{margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0}
+    .out b{display:inline-block;min-width:180px}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+    .kpi div{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center}
+    .kpi h3{margin:4px 0 0;font-size:18px}
+    .kpi span{display:block;color:var(--muted);font-size:12px}
+    footer{margin:20px 0;color:var(--muted);font-size:12px;text-align:center}
+
+    /* Page d'accueil */
+    #home{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;text-align:center}
+    #home h1{font-size:32px;margin-bottom:16px}
+    #home button{font-size:18px;padding:14px 24px;border-radius:14px;background:var(--primary);color:#fff;cursor:pointer;border:none;box-shadow:var(--shadow)}
+    #app{display:none}
+
+    /* Table séance */
+    table{width:100%;border-collapse:collapse}
+    th,td{border:1px solid #e2e8f0;padding:8px;text-align:center}
+    th{background:#f1f5f9}
+  </style>
+</head>
+<body>
+
+  <!-- Page d'accueil -->
+  <div id="home">
+    <h1>Calculateur Demi‑fond</h1>
+    <p class="subtitle">Application EPS – VMA, % et Tours</p>
+    <button onclick="startApp()">🚀 Démarrer</button>
+  </div>
+
+  <!-- Application -->
+  <div id="app" class="wrap">
+    <header>
+      <div>
+        <h1>Calculateur Demi‑fond</h1>
+        <div class="subtitle">Piste personnalisée (ex. 253 m) • Allure à %VMA • Tours, temps au tour, distances</div>
+      </div>
+    </header>
+
+    <div class="grid">
+
+      <!-- Bloc A : À partir de VMA & % -->
+      <section class="card half">
+        <h2>A. À partir de la VMA et du %</h2>
+        <div class="row">
+          <label for="lap">Distance d’un tour (m)</label>
+          <input id="lap" type="number" min="50" step="1" value="253" />
+          <div class="help">ex. 253</div>
+        </div>
+        <div class="row">
+          <label for="vma">VMA (km/h)</label>
+          <input id="vma" type="number" min="6" max="25" step="0.1" value="12" />
+          <div class="help">VMA mesurée (Luc Léger, VAMEVAL…)</div>
+        </div>
+        <div class="row">
+          <label for="pct">Intensité (% VMA)</label>
+          <input id="pct" type="number" min="50" max="110" step="1" value="80" />
+          <div class="help">Généralement 70–90 %</div>
+        </div>
+        <div class="row">
+          <label for="dur">Durée de l’effort (min)</label>
+          <input id="dur" type="number" min="1" step="1" value="15" />
+          <div class="btns">
+            <button class="ghost" onclick="setDur(12)">12 min</button>
+            <button class="ghost" onclick="setDur(15)">15 min</button>
+            <button class="ghost" onclick="setDur(20)">20 min</button>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="primary" onclick="calcFromVMA()">Calculer</button>
+          <button class="danger" onclick="resetA()">Réinitialiser</button>
+        </div>
+        <div id="outA" class="out" hidden></div>
+      </section>
+
+      <!-- Bloc B : À partir d’un temps au tour ou d’une durée globale -->
+      <section class="card half">
+        <h2>B. À partir d’un temps ou d’une durée → tours & %VMA</h2>
+        <div class="row">
+          <label for="lap2">Distance d’un tour (m)</label>
+          <input id="lap2" type="number" min="50" step="1" value="253" />
+          <div class="help">ex. 253</div>
+        </div>
+        <div class="row">
+          <label for="vma2">VMA (km/h)</label>
+          <input id="vma2" type="number" min="6" max="25" step="0.1" value="12" />
+          <div class="help">Pour estimer le %VMA</div>
+        </div>
+        <div class="row">
+          <label for="lapTime">Temps au tour (mm:ss)</label>
+          <input id="lapTime" type="text" placeholder="01:40" />
+          <div class="help">Option 1 : indique un temps au tour</div>
+        </div>
+        <div class="row">
+          <label for="dur2">Durée totale (min)</label>
+          <input id="dur2" type="number" min="1" step="1" value="15" />
+          <div class="help">Option 2 : indique une durée pour obtenir le nombre de tours</div>
+        </div>
+        <div class="btns">
+          <button class="primary" onclick="calcFromTime()">Calculer</button>
+          <button class="danger" onclick="resetB()">Réinitialiser</button>
+        </div>
+        <div id="outB" class="out" hidden></div>
+      </section>
+
+      <!-- Bloc S : Mode Séance (presets) -->
+      <section class="card">
+        <h2>🎯 Mode Séance (presets)</h2>
+        <div class="row" style="grid-template-columns:220px 1fr 180px">
+          <label for="preset">Choisir une séance type</label>
+          <select id="preset">
+            <option value="">— Sélectionne —</option>
+            <option value="2x6-80-3">2 × 6' @80% (récup 3')</option>
+            <option value="3x6-85-3">3 × 6' @85% (récup 3')</option>
+            <option value="4x4-90-2">4 × 4' @90% (récup 2')</option>
+            <option value="12x1-80-0">12' continu @80%</option>
+            <option value="15x1-80-0">15' projet @80%</option>
+            <option value="20x1-80-0">20' projet @80%</option>
+          </select>
+          <div class="btns">
+            <button class="primary" onclick="buildSession()">Générer cibles</button>
+            <button class="ghost" onclick="applyToInputs()">🔁 Appliquer aux champs</button>
+          </div>
+        </div>
+        <div id="outS" class="out" hidden></div>
+      </section>
+
+      <!-- Bloc C : Récap visuel -->
+      <section class="card">
+        <h2>Récapitulatif</h2>
+        <div class="kpi" id="kpi">
+          <div><span>Allure (m/min)</span><h3 id="k1">—</h3></div>
+          <div><span>Allure (km/h)</span><h3 id="k2">—</h3></div>
+          <div><span>Temps au tour</span><h3 id="k3">—</h3></div>
+          <div><span>Tours sur la durée</span><h3 id="k4">—</h3></div>
+        </div>
+      </section>
+
+      <!-- Bloc D : Aide rapide -->
+      <section class="card">
+        <h2>ℹ️ Aide rapide</h2>
+        <ul>
+          <li><b>Allure à %VMA</b> = VMA × (%/100). Exemple : 12 km/h à 80 % → 9,6 km/h.</li>
+          <li><b>Conversion</b> : 1 km/h = 1000/60 = 16,667 m/min = 0,2778 m/s.</li>
+          <li><b>Temps au tour</b> = distanceTour / vitesse (en m/s).</li>
+          <li><b>Tours sur une durée</b> = (vitesse m/min × minutes) / distanceTour.</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <footer>
+      © 2025 • Calculateur Demi‑fond – Équipe EPS Lycée Vauban Luxembourg – JB
+    </footer>
+  </div>
+
+<script>
+  function startApp(){
+    document.getElementById('home').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+
+  // Utilitaires
+  const toSeconds = (mmss) => {
+    if(!mmss) return NaN;
+    const parts = mmss.split(":").map(Number);
+    if(parts.length === 1) return parts[0];
+    if(parts.length === 2) return parts[0]*60 + parts[1];
+    return NaN;
+  };
+  const toMMSS = (sec) => {
+    if(!isFinite(sec) || sec<=0) return "—";
+    const m = Math.floor(sec/60);
+    const s = Math.round(sec%60);
+    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  };
+  const round = (x, d=2) => Number.isFinite(x) ? Number(x.toFixed(d)) : NaN;
+
+  function setDur(val){ document.getElementById('dur').value = val; }
+
+  // Bloc A – à partir de VMA & %
+  function calcFromVMA(){
+    const lap = parseFloat(document.getElementById('lap').value);
+    const vma = parseFloat(document.getElementById('vma').value);
+    const pct = parseFloat(document.getElementById('pct').value);
+    const dur = parseFloat(document.getElementById('dur').value);
+
+    if(!lap || !vma || !pct || !dur){ alert('Complète tous les champs.'); return; }
+
+    const v_kmh = vma * (pct/100);
+    const v_mps = v_kmh * 1000 / 3600; // m/s
+    const v_mpm = v_kmh * 1000 / 60;   // m/min
+
+    const lapTime_s = lap / v_mps;      // s
+    const totalDist = v_mpm * dur;      // m
+    const laps = totalDist / lap;       // nb
+
+    const out = document.getElementById('outA');
+    out.hidden = false;
+    out.innerHTML = `
+      <div><b>Vitesse à ${pct}%VMA :</b> ${round(v_kmh,2)} km/h • ${round(v_mpm,1)} m/min</div>
+      <div><b>Temps au tour (${lap} m) :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s)</div>
+      <div><b>En ${dur} min :</b> ${round(totalDist,0)} m • ≈ ${round(laps,2)} tours</div>
+    `;
+
+    document.getElementById('k1').textContent = `${round(v_mpm,1)} m/min`;
+    document.getElementById('k2').textContent = `${round(v_kmh,2)} km/h`;
+    document.getElementById('k3').textContent = toMMSS(lapTime_s);
+    document.getElementById('k4').textContent = `${round(laps,2)} tours`;
+  }
+
+  function resetA(){
+    document.getElementById('lap').value = 253;
+    document.getElementById('vma').value = 12;
+    document.getElementById('pct').value = 80;
+    document.getElementById('dur').value = 15;
+    document.getElementById('outA').hidden = true;
+    document.getElementById('k1').textContent = '—';
+    document.getElementById('k2').textContent = '—';
+    document.getElementById('k3').textContent = '—';
+    document.getElementById('k4').textContent = '—';
+  }
+
+  // Bloc B – à partir d'un temps ou d'une durée
+  function calcFromTime(){
+    const lap = parseFloat(document.getElementById('lap2').value);
+    const vma = parseFloat(document.getElementById('vma2').value);
+    const lapTimeTxt = document.getElementById('lapTime').value.trim();
+    const dur = parseFloat(document.getElementById('dur2').value);
+
+    if(!lap || !vma){ alert('Renseigne distance de tour et VMA.'); return; }
+
+    let html = '';
+
+    if(lapTimeTxt){
+      const lapTime_s = toSeconds(lapTimeTxt);
+      if(!isFinite(lapTime_s)){ alert('Temps au tour invalide. Format mm:ss'); return; }
+      const v_mps = lap / lapTime_s;
+      const v_kmh = v_mps * 3.6;
+      const pct = (v_kmh / vma) * 100;
+      html += `<div><b>Allure mesurée :</b> ${round(v_kmh,2)} km/h • ${round(v_mps*60,1)} m/min • ≈ ${round(pct,1)}% VMA</div>`;
+    }
+
+    if(dur){
+      const pctList = [70,80,90];
+      html += `<div style="margin-top:6px"><b>Tours à réaliser en ${dur} min :</b></div>`;
+      html += '<ul style="margin:6px 0 0 18px">';
+      pctList.forEach(p=>{
+        const v_kmh = vma * (p/100);
+        const v_mpm = v_kmh * 1000 / 60;
+        const dist = v_mpm * dur;
+        const laps = dist / lap;
+        html += `<li>${p}% VMA → ${round(dist,0)} m • ≈ ${round(laps,2)} tours</li>`;
+      });
+      html += '</ul>';
+    }
+
+    if(!html){ html = '<div>Aucun calcul : indique au moins un temps au tour ou une durée.</div>'; }
+
+    const out = document.getElementById('outB');
+    out.hidden = false;
+    out.innerHTML = html;
+  }
+
+  function resetB(){
+    document.getElementById('lap2').value = 253;
+    document.getElementById('vma2').value = 12;
+    document.getElementById('lapTime').value = '';
+    document.getElementById('dur2').value = 15;
+    document.getElementById('outB').hidden = true;
+  }
+
+  // Bloc S – Mode Séance
+  function parsePreset(code){
+    // code ex: "3x6-85-3" => reps=3, repMin=6, pct=85, recup=3
+    if(!code) return null;
+    const [left, right] = code.split('-');
+    const [rx, pctStr, recStr] = [left, right.split('-')?.[0], right.split('-')?.[1]]; // but right already contains both
+    const reps = Number(rx.split('x')[0]);
+    const repMin = Number(rx.split('x')[1]);
+    const pct = Number(right.split('-')[0]);
+    const rec = Number(right.split('-')[1]||0);
+    return {reps, repMin, pct, rec};
+  }
+
+  function buildSession(){
+    const sel = document.getElementById('preset').value;
+    if(!sel){ alert('Choisis une séance.'); return; }
+    const preset = parsePreset(sel);
+    const lap = parseFloat(document.getElementById('lap').value) || 253;
+    const vma = parseFloat(document.getElementById('vma').value) || 12;
+
+    const v_kmh = vma * (preset.pct/100);
+    const v_mps = v_kmh * 1000 / 3600;
+    const v_mpm = v_kmh * 1000 / 60;
+
+    let rows = '';
+    let totalDist = 0;
+    for(let i=1;i<=preset.reps;i++){
+      const dist = v_mpm * preset.repMin;
+      const laps = dist / lap;
+      const lapTime_s = lap / v_mps;
+      totalDist += dist;
+      rows += `<tr><td>${i}</td><td>${preset.repMin}'</td><td>${preset.pct}%</td><td>${Math.round(dist)} m</td><td>${round(laps,2)}</td><td>${toMMSS(lapTime_s)}</td></tr>`;
+    }
+
+    const html = `
+      <div><b>Entrées utilisées :</b> Tour ${lap} m • VMA ${vma} km/h • Séance ${preset.reps} × ${preset.repMin}' @ ${preset.pct}% (récup ${preset.rec||0}')
+      </div>
+      <div style="margin-top:8px;overflow:auto">
+        <table>
+          <thead><tr><th>Répetition</th><th>Durée</th><th>%VMA</th><th>Distance</th><th>Tours</th><th>Temps/tour</th></tr></thead>
+          <tbody>${rows}</tbody>
+          <tfoot><tr><th colspan="3">Total</th><th>${Math.round(totalDist)} m</th><th>${round(totalDist/lap,2)}</th><th>—</th></tr></tfoot>
+        </table>
+      </div>`;
+
+    const out = document.getElementById('outS');
+    out.hidden = false;
+    out.innerHTML = html;
+  }
+
+  function applyToInputs(){
+    const sel = document.getElementById('preset').value;
+    if(!sel){ alert('Choisis une séance.'); return; }
+    const preset = parsePreset(sel);
+    document.getElementById('pct').value = preset.pct;
+    document.getElementById('dur').value = preset.repMin; // pour calculer une répétition type
+    // puis l'utilisateur utilise A pour voir la cible au tour, et le tableau séance pour le volume total.
+    calcFromVMA();
+    document.getElementById('app').scrollIntoView({behavior:'smooth'});
+  }
+</script>
+</body>
+</html>
