@@ -42,6 +42,10 @@
     th,td{border:1px solid #e2e8f0;padding:8px;text-align:center}
     th{background:#f1f5f9}
     footer{margin:20px 0;color:var(--muted);font-size:12px;text-align:center}
+    /* Page d'accueil centrée */
+    #home{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}
+    #home h1{font-size:clamp(28px,6vw,42px);margin-bottom:12px}
+    #home button{font-size:20px;padding:16px 28px;background:var(--primary);color:#fff;border-radius:16px}
   </style>
 </head>
 <body>
@@ -96,7 +100,7 @@
           <button class="danger" onclick="resetA()">Réinitialiser</button>
         </div>
         <div id="outA" class="out" hidden></div>
-        <!-- Récap A directement sous la sortie A -->
+        <!-- Récap A juste dessous -->
         <div id="recapA" class="recap" hidden>
           <h3>Récapitulatif</h3>
           <div class="kpi">
@@ -108,7 +112,7 @@
         </div>
       </section>
 
-      <!-- Bloc B : À partir d’un temps au tour ou d’une durée globale -->
+      <!-- Bloc B : À partir d’un temps ou d’une durée globale -->
       <section class="card half">
         <h2>B. À partir d’un temps ou d’une durée → tours & %VMA</h2>
         <div class="row">
@@ -136,7 +140,7 @@
           <button class="danger" onclick="resetB()">Réinitialiser</button>
         </div>
         <div id="outB" class="out" hidden></div>
-        <!-- Récap B directement sous la sortie B -->
+        <!-- Récap B juste dessous -->
         <div id="recapB" class="recap" hidden>
           <h3>Récapitulatif</h3>
           <div id="recapBContent">—</div>
@@ -192,7 +196,7 @@
         <div id="outSP" class="out" hidden></div>
       </section>
 
-      <!-- Bloc T : Tests -->
+      <!-- Bloc (dev) Tests – replié par défaut pour ne pas gêner -->
       <section class="card">
         <details>
           <summary>🧪 Tests automatisés (dev)</summary>
@@ -468,24 +472,22 @@
   }
   function closeQR(){ document.getElementById('qrModal').style.display='none'; }
 
-  // === Tests ===
+  // === Tests (dev) – non intrusifs ===
   function runTests(){
     const ul = document.getElementById('testResults');
+    if(!ul) return;
     const add = (ok,msg)=>{
       const li = document.createElement('li'); li.style.listStyle='none';
       li.style.margin='4px 0'; li.textContent=(ok?'✅ ':'❌ ')+msg; ul.appendChild(li);
     };
     const approx=(a,b,eps=1e-2)=>Math.abs(a-b)<=eps;
 
-    // Test 1
     const p = parsePreset('3x6-85-3');
     add(p.reps===3 && p.repMin===6 && p.pct===85 && p.rec===3, 'parsePreset(3x6-85-3) OK');
 
-    // Test 2
     const lap=253, vma=12, pct=80; const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600;
     const expectedLapS = lap / v_mps; add(approx(expectedLapS, 94.875, 0.5), 'Temps tour ~94.9s @12km/h 80% sur 253m');
 
-    // Test 3: buildCustom ne crash pas
     try{
       document.getElementById('lap').value = lap;
       document.getElementById('vma').value = vma;
@@ -497,7 +499,6 @@
       add(document.getElementById('outSP').innerHTML.includes('<table'), 'buildCustom() génère un tableau');
     }catch(e){ add(false, 'buildCustom() erreur: '+e.message); }
 
-    // Test 4: parsePreset pour continu 12' @80
     const p2 = parsePreset('12x1-80-0');
     add(p2.reps===12 && p2.repMin===1 && p2.pct===80 && p2.rec===0, 'parsePreset(12x1-80-0) OK');
   }
