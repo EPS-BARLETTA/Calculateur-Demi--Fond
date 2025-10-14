@@ -16,8 +16,19 @@
   html,body{height:100%}
   .min-h-app{min-height:100vh;display:flex;flex-direction:column}
   .app-content{flex:1}
-  /* cartes de résultats centrées et propres à l'impression */
   .print-card{background:#fff;border:1px solid rgb(226 232 240);border-radius:16px;padding:16px}
+  .center-table{display:flex;justify-content:center;width:100%}
+  .export-frame{
+    width:794px; /* A4 pt≈ 595x842, mais on passe par canvas -> px. Ici cadre paysage/portrait visuel */
+    max-width:100%;
+    background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;
+    padding:28px 28px 18px 28px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+  }
+  .export-header{border-bottom:1px solid #e5e7eb;padding-bottom:10px;margin-bottom:12px}
+  .export-footer{border-top:1px solid #e5e7eb;margin-top:14px;padding-top:8px;
+    font-size:11px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
+  .brand{font-weight:600;color:#334155}
   @media print{ .no-print{display:none!important} body{background:#fff} .print-card{border:0;border-radius:0;padding:0} }
 </style>
 </head>
@@ -153,15 +164,15 @@
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetA()">Réinitialiser</button>
           </div>
 
-          <!-- Résultats A (toujours centrés) -->
+          <!-- Résultats A (centrés) -->
           <div id="outA" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
 
           <div id="recapA" class="hidden max-w-3xl mx-auto print-card">
             <div class="flex items-center justify-between gap-2 mb-3 no-print">
               <h4 class="font-semibold">Récapitulatif</h4>
               <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapA','recap-A.png')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapA','recap-A.pdf')">🧾 PDF</button>
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapA','recap-A.png','Récapitulatif')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapA','recap-A.pdf','Récapitulatif')">🧾 PDF</button>
               </div>
             </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -184,13 +195,11 @@
             <div class="flex items-center justify-between gap-2 mb-3 no-print">
               <h4 class="font-semibold">Passages cumulés</h4>
               <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passA','passages-A.png')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passA','passages-A.pdf')">🧾 PDF</button>
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passA','passages-A.png','Passages cumulés')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passA','passages-A.pdf','Passages cumulés')">🧾 PDF</button>
               </div>
             </div>
-            <div id="passAContent" class="overflow-auto">
-              <!-- table auto-centrée injectée ici -->
-            </div>
+            <div id="passAContent" class="center-table overflow-auto"></div>
           </div>
         </div>
       </div>
@@ -236,8 +245,8 @@
             <div class="flex items-center justify-between gap-2 mb-3 no-print">
               <h4 class="font-semibold">Récapitulatif</h4>
               <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapB','recap-B.png')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapB','recap-B.pdf')">🧾 PDF</button>
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapB','recap-B.png','Récapitulatif')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapB','recap-B.pdf','Récapitulatif')">🧾 PDF</button>
               </div>
             </div>
             <div id="recapBContent">—</div>
@@ -247,11 +256,11 @@
             <div class="flex items-center justify-between gap-2 mb-3 no-print">
               <h4 class="font-semibold">Passages cumulés</h4>
               <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passB','passages-B.png')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passB','passages-B.pdf')">🧾 PDF</button>
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passB','passages-B.png','Passages cumulés')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passB','passages-B.pdf','Passages cumulés')">🧾 PDF</button>
               </div>
             </div>
-            <div id="passBContent" class="overflow-auto"></div>
+            <div id="passBContent" class="center-table overflow-auto"></div>
           </div>
         </div>
       </div>
@@ -282,21 +291,21 @@
           <div class="flex items-center justify-between gap-2 mb-3 no-print">
             <h4 class="font-semibold">Tableau cibles</h4>
             <div class="flex gap-2">
-              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outS','seance-cibles.png')">📸 PNG</button>
-              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outS','seance-cibles.pdf')">🧾 PDF</button>
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outS','seance-cibles.png','Séance — Cibles')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outS','seance-cibles.pdf','Séance — Cibles')">🧾 PDF</button>
             </div>
           </div>
-          <div id="outSContent" class="overflow-auto"></div>
+          <div id="outSContent" class="center-table overflow-auto"></div>
         </div>
         <div id="passS" class="hidden max-w-3xl mx-auto print-card mt-4">
           <div class="flex items-center justify-between gap-2 mb-3 no-print">
             <h4 class="font-semibold">Passages cumulés</h4>
             <div class="flex gap-2">
-              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passS','seance-passages.png')">📸 PNG</button>
-              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passS','seance-passages.pdf')">🧾 PDF</button>
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passS','seance-passages.png','Séance — Passages cumulés')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passS','seance-passages.pdf','Séance — Passages cumulés')">🧾 PDF</button>
             </div>
           </div>
-          <div id="passSContent" class="overflow-auto"></div>
+          <div id="passSContent" class="center-table overflow-auto"></div>
         </div>
       </div>
 
@@ -333,21 +342,21 @@
           <div class="flex items-center justify-between gap-2 mb-3 no-print">
             <h4 class="font-semibold">Tableau séance perso</h4>
             <div class="flex gap-2">
-              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outSP','perso-cibles.png')">📸 PNG</button>
-              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outSP','perso-cibles.pdf')">🧾 PDF</button>
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outSP','perso-cibles.png','Séance perso — Cibles')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outSP','perso-cibles.pdf','Séance perso — Cibles')">🧾 PDF</button>
             </div>
           </div>
-          <div id="outSPContent" class="overflow-auto"></div>
+          <div id="outSPContent" class="center-table overflow-auto"></div>
         </div>
         <div id="passSP" class="hidden max-w-3xl mx-auto print-card mt-4">
           <div class="flex items-center justify-between gap-2 mb-3 no-print">
             <h4 class="font-semibold">Passages cumulés</h4>
             <div class="flex gap-2">
-              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passSP','perso-passages.png')">📸 PNG</button>
-              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passSP','perso-passages.pdf')">🧾 PDF</button>
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passSP','perso-passages.png','Séance perso — Passages cumulés')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passSP','perso-passages.pdf','Séance perso — Passages cumulés')">🧾 PDF</button>
             </div>
           </div>
-          <div id="passSPContent" class="overflow-auto"></div>
+          <div id="passSPContent" class="center-table overflow-auto"></div>
         </div>
       </div>
 
@@ -548,10 +557,10 @@
     const totalLaps=totalDist/lap, lapS=lap/v_mps;
 
     const table=`
-      <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${p.reps} × ${p.repMin}' @ ${p.pct}% (récup ${p.rec||0}')<br>
+      <div class="text-center"><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${p.reps} × ${p.repMin}' @ ${p.pct}% (récup ${p.rec||0}')<br>
       <b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s)</div>
-      <div class="overflow-auto mt-3">
-        <table class="table-auto mx-auto border text-sm">
+      <div class="overflow-auto mt-3 center-table">
+        <table class="table-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
@@ -590,10 +599,10 @@
     const totalLaps=totalDist/lap, totalTimeMin=reps*repMin+rec*(reps-1), lapS=lap/v_mps;
 
     const table=`
-      <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${reps} × ${repMin}' @ ${pct}% (récup ${rec}')
+      <div class="text-center"><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${reps} × ${repMin}' @ ${pct}% (récup ${rec}')
       <br><b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s) • <b>Durée totale :</b> ${totalTimeMin}'</div>
-      <div class="overflow-auto mt-3">
-        <table class="table-auto mx-auto border text-sm">
+      <div class="overflow-auto mt-3 center-table">
+        <table class="table-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
@@ -604,7 +613,7 @@
     document.getElementById('outSPContent').innerHTML=table;
   }
 
-  // Passages cumulés (toutes sections) — tables centrées
+  // Passages cumulés — tables centrées
   function buildPassages(kind){
     if(kind==='A'){
       const lap=+document.getElementById('lap').value;
@@ -615,9 +624,9 @@
       const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600;
       const lapS=lap/v_mps, totalS=dur*60, laps=Math.floor(totalS/lapS);
       let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
-      const html=`<div class="text-center">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
-      <div class="overflow-auto mt-2">
-        <table class="table-auto mx-auto border text-sm">
+      const html=`<div class="text-center mb-2">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto center-table">
+        <table class="table-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -632,9 +641,9 @@
       const lapS=toSeconds(t); if(!isFinite(lapS)){ alert('Format mm:ss'); return; }
       const totalS=dur*60, laps=Math.floor(totalS/lapS);
       let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
-      const html=`<div class="text-center">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
-      <div class="overflow-auto mt-2">
-        <table class="table-auto mx-auto border text-sm">
+      const html=`<div class="text-center mb-2">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto center-table">
+        <table class="table-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -662,64 +671,92 @@
         const lapsThis=Math.floor((repMin*60)/lapS);
         let rows=''; for(let i=1;i<=lapsThis;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
         sections+=`<h4 class="font-semibold mt-3 text-center">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
-          <div class="overflow-auto">
-            <table class="table-auto mx-auto border text-sm">
+          <div class="overflow-auto center-table">
+            <table class="table-auto border text-sm">
               <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>`;
       }
-      const html=`<div class="text-center">Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
+      const html=`<div class="text-center mb-2">Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
       const id=isPreset?'passS':'passSP';
       const box=document.getElementById(id); box.classList.remove('hidden'); document.getElementById(id+'Content').innerHTML=html;
     }
   }
 
-  // ---- Export / Partage (PNG / PDF) ----
-  async function sharePNG(containerId, filename='visuel.png'){
-   const el=document.getElementById(containerId);
-   if(!el){ alert('Rien à exporter.'); return; }
-   const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff'});
+  // ------- Export / Partage avec gabarit pro (header + footer) -------
+  function buildExportNode(containerId, titleText){
+    const source=document.getElementById(containerId);
+    const clone=source.cloneNode(true);
+    // masquer boutons d’action dans le clone
+    clone.querySelectorAll('.no-print').forEach(el=>el.remove());
+
+    const frame=document.createElement('div');
+    frame.className='export-frame';
+    const now=new Date();
+    const date=now.toLocaleString('fr-FR');
+
+    frame.innerHTML=`
+      <div class="export-header">
+        <div class="text-lg font-bold">Calculateur Demi-fond — ${titleText||''}</div>
+        <div class="text-xs text-slate-500">Généré le ${date}</div>
+      </div>
+    `;
+    frame.appendChild(clone);
+    const footer=document.createElement('div');
+    footer.className='export-footer';
+    footer.innerHTML=`
+      <div class="brand">ScanProf • Équipe EPS Lycée Vauban – Luxembourg – JB</div>
+      <div>www.eps-vauban • Partage iPad (AirDrop/Mail/Teams)</div>
+    `;
+    frame.appendChild(footer);
+    return frame;
+  }
+
+  async function sharePNG(containerId, filename='visuel.png', title=''){
+   const frame=buildExportNode(containerId, title);
+   document.body.appendChild(frame);
+   const canvas=await html2canvas(frame,{scale:2,backgroundColor:'#ffffff'});
+   frame.remove();
    canvas.toBlob(async (blob)=>{
      if(!blob){ alert('Export PNG impossible.'); return; }
      const file=new File([blob], filename, {type:'image/png'});
      if(navigator.canShare && navigator.canShare({files:[file]})){
-       try{ await navigator.share({files:[file], title:filename}); } 
-       catch(e){ /* annulé */ }
+       try{ await navigator.share({files:[file], title:filename}); } catch(e){}
      }else{
-       // fallback téléchargement
        const url=URL.createObjectURL(blob);
        const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
        setTimeout(()=>URL.revokeObjectURL(url), 5000);
-       alert('PNG téléchargé. Utilise le menu Partager (iPad) pour AirDrop.');
+       alert('PNG téléchargé.');
      }
    }, 'image/png');
   }
 
-  async function sharePDF(containerId, filename='visuel.pdf'){
+  async function sharePDF(containerId, filename='visuel.pdf', title=''){
     const { jsPDF } = window.jspdf;
-    const el=document.getElementById(containerId);
-    if(!el){ alert('Rien à exporter.'); return; }
-    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff'});
+    const frame=buildExportNode(containerId, title);
+    document.body.appendChild(frame);
+    const canvas=await html2canvas(frame,{scale:2,backgroundColor:'#ffffff'});
+    frame.remove();
+
     const imgData=canvas.toDataURL('image/png');
     const pdf=new jsPDF({orientation:'p', unit:'pt', format:'a4'});
     const pageW=pdf.internal.pageSize.getWidth();
     const pageH=pdf.internal.pageSize.getHeight();
-    // resize image to fit page with marges
     const margin=24;
+    // Fit image to page with margins
     const imgW=pageW - margin*2;
     const ratio=canvas.height/canvas.width;
     const imgH=imgW*ratio;
     const y = (pageH - imgH)/2 > margin ? (pageH - imgH)/2 : margin;
     pdf.addImage(imgData,'PNG', margin, y, imgW, imgH, undefined, 'FAST');
+
     const blob=pdf.output('blob');
     const file=new File([blob], filename, {type:'application/pdf'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{ await navigator.share({files:[file], title:filename}); }
-      catch(e){ /* annulé */ }
+      try{ await navigator.share({files:[file], title:filename}); } catch(e){}
     }else{
       pdf.save(filename);
-      alert('PDF téléchargé. Utilise le menu Partager (iPad) pour AirDrop.');
     }
   }
 </script>
