@@ -4,16 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Calculateur Demi-fond</title>
-<!-- Tailwind CSS CDN -->
+
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+
+<!-- html2canvas (capture visuelle) + jsPDF (PDF) -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
 <style>
   html,body{height:100%}
   .min-h-app{min-height:100vh;display:flex;flex-direction:column}
   .app-content{flex:1}
-  @media print{
-    .no-print{display:none!important}
-    body{background:#fff}
-  }
+  /* cartes de résultats centrées et propres à l'impression */
+  .print-card{background:#fff;border:1px solid rgb(226 232 240);border-radius:16px;padding:16px}
+  @media print{ .no-print{display:none!important} body{background:#fff} .print-card{border:0;border-radius:0;padding:0} }
 </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-app">
@@ -50,23 +55,19 @@
     </div>
 
     <div class="grid sm:grid-cols-2 gap-4">
-      <button class="rounded-2xl p-6 text-left bg-blue-700 text-white shadow hover:shadow-lg"
-              onclick="goto('A')">
+      <button class="rounded-2xl p-6 text-left bg-blue-700 text-white shadow hover:shadow-lg" onclick="goto('A')">
         <h3 class="text-xl font-extrabold">À partir de la VMA et du %</h3>
         <p class="text-white/90">Temps au tour, distance, tours, passages.</p>
       </button>
-      <button class="rounded-2xl p-6 text-left bg-emerald-700 text-white shadow hover:shadow-lg"
-              onclick="goto('B')">
+      <button class="rounded-2xl p-6 text-left bg-emerald-700 text-white shadow hover:shadow-lg" onclick="goto('B')">
         <h3 class="text-xl font-extrabold">À partir d’un temps/durée <span class="ml-2 inline-block text-xs px-2 py-0.5 rounded-full bg-white/20">Outil avancé</span></h3>
         <p class="text-white/90">%VMA estimé, tours, passages.</p>
       </button>
-      <button class="rounded-2xl p-6 text-left bg-amber-700 text-white shadow hover:shadow-lg"
-              onclick="goto('S')">
+      <button class="rounded-2xl p-6 text-left bg-amber-700 text-white shadow hover:shadow-lg" onclick="goto('S')">
         <h3 class="text-xl font-extrabold">🎯 Mode Séance (presets)</h3>
         <p class="text-white/90">Cibles et passages cumulés.</p>
       </button>
-      <button class="rounded-2xl p-6 text-left bg-violet-700 text-white shadow hover:shadow-lg"
-              onclick="goto('SP')">
+      <button class="rounded-2xl p-6 text-left bg-violet-700 text-white shadow hover:shadow-lg" onclick="goto('SP')">
         <h3 class="text-xl font-extrabold">🛠️ Séance personnalisée</h3>
         <p class="text-white/90">Crée ta séance + passages.</p>
       </button>
@@ -82,14 +83,13 @@
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 class="text-2xl font-bold">Calculateur Demi-fond</h2>
-        <p class="text-slate-600">Tout est centré. Paramètre la piste, calcule, partage en PDF.</p>
+        <p class="text-slate-600">Paramètre la piste, calcule, puis partage un visuel (PNG/PDF).</p>
       </div>
       <div class="flex gap-2 no-print">
         <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goMenu()">⬅️ Menu</button>
         <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goHome()">🏠 Accueil</button>
         <button class="px-4 py-2 rounded-lg bg-violet-100 text-violet-900 hover:bg-violet-200" onclick="openModal('help')">❓ Aide</button>
         <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="openModal('vma')">ℹ️ VMA</button>
-        <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="exportPDF()">🧾 Partager en PDF</button>
       </div>
     </div>
 
@@ -153,10 +153,17 @@
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetA()">Réinitialiser</button>
           </div>
 
-          <div id="outA" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm"></div>
+          <!-- Résultats A (toujours centrés) -->
+          <div id="outA" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
 
-          <div id="recapA" class="hidden rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <h4 class="font-semibold mb-2">Récapitulatif</h4>
+          <div id="recapA" class="hidden max-w-3xl mx-auto print-card">
+            <div class="flex items-center justify-between gap-2 mb-3 no-print">
+              <h4 class="font-semibold">Récapitulatif</h4>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapA','recap-A.png')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapA','recap-A.pdf')">🧾 PDF</button>
+              </div>
+            </div>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div class="rounded-lg bg-white border p-3 text-center">
                 <div class="text-slate-500 text-xs">Allure (m/min)</div><div id="k1" class="text-lg font-bold">—</div>
@@ -173,7 +180,18 @@
             </div>
           </div>
 
-          <div id="passA" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+          <div id="passA" class="hidden max-w-3xl mx-auto print-card">
+            <div class="flex items-center justify-between gap-2 mb-3 no-print">
+              <h4 class="font-semibold">Passages cumulés</h4>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passA','passages-A.png')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passA','passages-A.pdf')">🧾 PDF</button>
+              </div>
+            </div>
+            <div id="passAContent" class="overflow-auto">
+              <!-- table auto-centrée injectée ici -->
+            </div>
+          </div>
         </div>
       </div>
 
@@ -212,12 +230,29 @@
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetB()">Réinitialiser</button>
           </div>
 
-          <div id="outB" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm"></div>
-          <div id="recapB" class="hidden rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <h4 class="font-semibold mb-2">Récapitulatif</h4>
+          <div id="outB" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
+
+          <div id="recapB" class="hidden max-w-3xl mx-auto print-card">
+            <div class="flex items-center justify-between gap-2 mb-3 no-print">
+              <h4 class="font-semibold">Récapitulatif</h4>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapB','recap-B.png')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapB','recap-B.pdf')">🧾 PDF</button>
+              </div>
+            </div>
             <div id="recapBContent">—</div>
           </div>
-          <div id="passB" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+
+          <div id="passB" class="hidden max-w-3xl mx-auto print-card">
+            <div class="flex items-center justify-between gap-2 mb-3 no-print">
+              <h4 class="font-semibold">Passages cumulés</h4>
+              <div class="flex gap-2">
+                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passB','passages-B.png')">📸 PNG</button>
+                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passB','passages-B.pdf')">🧾 PDF</button>
+              </div>
+            </div>
+            <div id="passBContent" class="overflow-auto"></div>
+          </div>
         </div>
       </div>
 
@@ -243,8 +278,26 @@
             <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('S')">Passages</button>
           </div>
         </div>
-        <div id="outS" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
-        <div id="passS" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        <div id="outS" class="hidden max-w-3xl mx-auto print-card mt-4">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Tableau cibles</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outS','seance-cibles.png')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outS','seance-cibles.pdf')">🧾 PDF</button>
+            </div>
+          </div>
+          <div id="outSContent" class="overflow-auto"></div>
+        </div>
+        <div id="passS" class="hidden max-w-3xl mx-auto print-card mt-4">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Passages cumulés</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passS','seance-passages.png')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passS','seance-passages.pdf')">🧾 PDF</button>
+            </div>
+          </div>
+          <div id="passSContent" class="overflow-auto"></div>
+        </div>
       </div>
 
       <!-- Bloc SP -->
@@ -276,8 +329,26 @@
           <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="buildCustom()">Calculer</button>
           <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('SP')">Passages</button>
         </div>
-        <div id="outSP" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
-        <div id="passSP" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        <div id="outSP" class="hidden max-w-3xl mx-auto print-card mt-4">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Tableau séance perso</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('outSP','perso-cibles.png')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('outSP','perso-cibles.pdf')">🧾 PDF</button>
+            </div>
+          </div>
+          <div id="outSPContent" class="overflow-auto"></div>
+        </div>
+        <div id="passSP" class="hidden max-w-3xl mx-auto print-card mt-4">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Passages cumulés</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passSP','perso-passages.png')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passSP','perso-passages.pdf')">🧾 PDF</button>
+            </div>
+          </div>
+          <div id="passSPContent" class="overflow-auto"></div>
+        </div>
       </div>
 
     </div>
@@ -301,7 +372,7 @@
       <li>Règle la <b>Distance d’un tour</b> (ex. 253 m) — s’applique partout.</li>
       <li><b>VMA &amp; %</b> : calcule allure, temps au tour, tours, passages.</li>
       <li><b>Temps/Durée (avancé)</b> : utile si tu connais un <i>temps au tour</i> mais pas le %VMA.</li>
-      <li><b>Partager en PDF</b> → AirDrop / Mail / Teams depuis l’iPad.</li>
+      <li><b>Exporter PNG/PDF</b> → AirDrop / Mail / Teams depuis l’iPad.</li>
     </ol>
   </div>
 </div>
@@ -384,9 +455,12 @@
     const out=document.getElementById('outA');
     out.classList.remove('hidden');
     out.innerHTML=`
-      <div><b>Vitesse à ${pct}%VMA :</b> ${round(v_kmh,2)} km/h • ${round(v_mpm,1)} m/min</div>
-      <div><b>Temps au tour (${lap} m) :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s)</div>
-      <div><b>En ${dur} min :</b> ${Math.round(totalDist)} m • ≈ ${round(laps,2)} tours</div>
+      <div class="text-center mb-2 font-semibold">Résultats</div>
+      <div class="space-y-1 text-center">
+        <div><b>Vitesse à ${pct}%VMA :</b> ${round(v_kmh,2)} km/h • ${round(v_mpm,1)} m/min</div>
+        <div><b>Temps au tour (${lap} m) :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s)</div>
+        <div><b>En ${dur} min :</b> ${Math.round(totalDist)} m • ≈ ${round(laps,2)} tours</div>
+      </div>
     `;
 
     document.getElementById('k1').textContent=`${round(v_mpm,1)} m/min`;
@@ -433,7 +507,7 @@
     if(!html){ html='<div>Aucun calcul : indique au moins un temps au tour ou une durée.</div>'; }
 
     const out=document.getElementById('outB');
-    out.classList.remove('hidden'); out.innerHTML=html;
+    out.classList.remove('hidden'); out.innerHTML=`<div class="text-center mb-2 font-semibold">Résultats</div><div class="text-sm">${html}</div>`;
     const r=document.getElementById('recapB'); r.classList.remove('hidden');
     document.getElementById('recapBContent').innerHTML=html;
   }
@@ -473,18 +547,19 @@
     }
     const totalLaps=totalDist/lap, lapS=lap/v_mps;
 
-    const html=`
+    const table=`
       <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${p.reps} × ${p.repMin}' @ ${p.pct}% (récup ${p.rec||0}')<br>
       <b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s)</div>
       <div class="overflow-auto mt-3">
-        <table class="w-full border text-sm">
+        <table class="table-auto mx-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
         </table>
       </div>`;
     const out=document.getElementById('outS');
-    out.classList.remove('hidden'); out.innerHTML=html;
+    out.classList.remove('hidden');
+    document.getElementById('outSContent').innerHTML=table;
   }
   function applyToInputs(){
     const sel=document.getElementById('preset').value;
@@ -514,21 +589,22 @@
     }
     const totalLaps=totalDist/lap, totalTimeMin=reps*repMin+rec*(reps-1), lapS=lap/v_mps;
 
-    const html=`
+    const table=`
       <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${reps} × ${repMin}' @ ${pct}% (récup ${rec}')
       <br><b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s) • <b>Durée totale :</b> ${totalTimeMin}'</div>
       <div class="overflow-auto mt-3">
-        <table class="w-full border text-sm">
+        <table class="table-auto mx-auto border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
         </table>
       </div>`;
     const out=document.getElementById('outSP');
-    out.classList.remove('hidden'); out.innerHTML=html;
+    out.classList.remove('hidden');
+    document.getElementById('outSPContent').innerHTML=table;
   }
 
-  // Passages cumulés
+  // Passages cumulés (toutes sections) — tables centrées
   function buildPassages(kind){
     if(kind==='A'){
       const lap=+document.getElementById('lap').value;
@@ -538,10 +614,15 @@
       if(!lap||!vma||!pct||!dur){ alert('Complète le bloc A.'); return; }
       const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600;
       const lapS=lap/v_mps, totalS=dur*60, laps=Math.floor(totalS/lapS);
-      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
-      const html=`<div><b>Passages cumulés</b> — ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
-      <div class="overflow-auto mt-2"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-      const box=document.getElementById('passA'); box.classList.remove('hidden'); box.innerHTML=html;
+      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
+      const html=`<div class="text-center">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto mt-2">
+        <table class="table-auto mx-auto border text-sm">
+          <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+      const box=document.getElementById('passA'); box.classList.remove('hidden'); document.getElementById('passAContent').innerHTML=html;
     }
     if(kind==='B'){
       const lap=+document.getElementById('lap2').value;
@@ -550,10 +631,15 @@
       if(!lap||!t||!dur){ alert('Distance, temps au tour et durée requis.'); return; }
       const lapS=toSeconds(t); if(!isFinite(lapS)){ alert('Format mm:ss'); return; }
       const totalS=dur*60, laps=Math.floor(totalS/lapS);
-      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
-      const html=`<div><b>Passages cumulés</b> — ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
-      <div class="overflow-auto mt-2"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-      const box=document.getElementById('passB'); box.classList.remove('hidden'); box.innerHTML=html;
+      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
+      const html=`<div class="text-center">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto mt-2">
+        <table class="table-auto mx-auto border text-sm">
+          <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+      const box=document.getElementById('passB'); box.classList.remove('hidden'); document.getElementById('passBContent').innerHTML=html;
     }
     if(kind==='S' || kind==='SP'){
       const isPreset=(kind==='S');
@@ -574,18 +660,68 @@
       let sections='';
       for(let r=1;r<=reps;r++){
         const lapsThis=Math.floor((repMin*60)/lapS);
-        let rows=''; for(let i=1;i<=lapsThis;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
-        sections+=`<h4 class="font-semibold mt-3">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
-          <div class="overflow-auto"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        let rows=''; for(let i=1;i<=lapsThis;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
+        sections+=`<h4 class="font-semibold mt-3 text-center">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
+          <div class="overflow-auto">
+            <table class="table-auto mx-auto border text-sm">
+              <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>`;
       }
-      const html=`<div><b>Passages cumulés</b> — Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
+      const html=`<div class="text-center">Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
       const id=isPreset?'passS':'passSP';
-      const box=document.getElementById(id); box.classList.remove('hidden'); box.innerHTML=html;
+      const box=document.getElementById(id); box.classList.remove('hidden'); document.getElementById(id+'Content').innerHTML=html;
     }
   }
 
-  // Export PDF
-  function exportPDF(){ window.print(); }
+  // ---- Export / Partage (PNG / PDF) ----
+  async function sharePNG(containerId, filename='visuel.png'){
+   const el=document.getElementById(containerId);
+   if(!el){ alert('Rien à exporter.'); return; }
+   const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff'});
+   canvas.toBlob(async (blob)=>{
+     if(!blob){ alert('Export PNG impossible.'); return; }
+     const file=new File([blob], filename, {type:'image/png'});
+     if(navigator.canShare && navigator.canShare({files:[file]})){
+       try{ await navigator.share({files:[file], title:filename}); } 
+       catch(e){ /* annulé */ }
+     }else{
+       // fallback téléchargement
+       const url=URL.createObjectURL(blob);
+       const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+       setTimeout(()=>URL.revokeObjectURL(url), 5000);
+       alert('PNG téléchargé. Utilise le menu Partager (iPad) pour AirDrop.');
+     }
+   }, 'image/png');
+  }
+
+  async function sharePDF(containerId, filename='visuel.pdf'){
+    const { jsPDF } = window.jspdf;
+    const el=document.getElementById(containerId);
+    if(!el){ alert('Rien à exporter.'); return; }
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:'#ffffff'});
+    const imgData=canvas.toDataURL('image/png');
+    const pdf=new jsPDF({orientation:'p', unit:'pt', format:'a4'});
+    const pageW=pdf.internal.pageSize.getWidth();
+    const pageH=pdf.internal.pageSize.getHeight();
+    // resize image to fit page with marges
+    const margin=24;
+    const imgW=pageW - margin*2;
+    const ratio=canvas.height/canvas.width;
+    const imgH=imgW*ratio;
+    const y = (pageH - imgH)/2 > margin ? (pageH - imgH)/2 : margin;
+    pdf.addImage(imgData,'PNG', margin, y, imgW, imgH, undefined, 'FAST');
+    const blob=pdf.output('blob');
+    const file=new File([blob], filename, {type:'application/pdf'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:filename}); }
+      catch(e){ /* annulé */ }
+    }else{
+      pdf.save(filename);
+      alert('PDF téléchargé. Utilise le menu Partager (iPad) pour AirDrop.');
+    }
+  }
 </script>
 </body>
 </html>
