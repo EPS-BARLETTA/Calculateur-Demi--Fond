@@ -17,10 +17,14 @@
   .min-h-app{min-height:100vh;display:flex;flex-direction:column}
   .app-content{flex:1}
   .print-card{background:#fff;border:1px solid rgb(226 232 240);border-radius:16px;padding:16px}
+  /* --- Centrage béton des tableaux --- */
   .center-table{display:flex;justify-content:center;width:100%}
+  .center-table > table{width:auto;margin:0 auto}
+  .center-table table{table-layout:auto}
+  .center-table th, .center-table td{text-align:center}
+  /* Gabarit export pro */
   .export-frame{
-    width:794px; /* A4 pt≈ 595x842, mais on passe par canvas -> px. Ici cadre paysage/portrait visuel */
-    max-width:100%;
+    width:794px; max-width:100%;
     background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;
     padding:28px 28px 18px 28px;
     box-shadow:0 10px 30px rgba(0,0,0,.08);
@@ -28,7 +32,7 @@
   .export-header{border-bottom:1px solid #e5e7eb;padding-bottom:10px;margin-bottom:12px}
   .export-footer{border-top:1px solid #e5e7eb;margin-top:14px;padding-top:8px;
     font-size:11px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
-  .brand{font-weight:600;color:#334155}
+  .brand{font-weight:600;color:#334155;display:flex;align-items:center;gap:8px}
   @media print{ .no-print{display:none!important} body{background:#fff} .print-card{border:0;border-radius:0;padding:0} }
 </style>
 </head>
@@ -56,7 +60,7 @@
     <div class="flex items-center justify-between mb-6">
       <div>
         <h2 class="text-2xl font-bold">Choisis un mode</h2>
-        <p class="text-slate-600">Tout est centré et prêt pour l’iPad.</p>
+        <p class="text-slate-600">Interface centrée, prête pour l’iPad.</p>
       </div>
       <div class="flex gap-2 no-print">
         <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goHome()">🏠 Accueil</button>
@@ -164,7 +168,7 @@
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetA()">Réinitialiser</button>
           </div>
 
-          <!-- Résultats A (centrés) -->
+          <!-- Résultats A -->
           <div id="outA" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
 
           <div id="recapA" class="hidden max-w-3xl mx-auto print-card">
@@ -392,17 +396,37 @@
       <h3 class="text-lg font-semibold">Infos VMA</h3>
       <button class="px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="closeModal('vma')">✕</button>
     </div>
+
     <div>
-      <h4 class="font-semibold">🔹 Version simple</h4>
-      <p class="text-slate-700">La <b>VMA</b> (Vitesse Maximale Aérobie) ≈ vitesse max tenable ~<b>5–7 min</b>. On l’utilise pour fixer les <b>allures</b> (ex. 80% VMA).</p>
+      <h4 class="font-semibold">🔹 Définition simple (élèves)</h4>
+      <p class="text-slate-700">
+        La <b>VMA</b> (Vitesse Maximale Aérobie) est la vitesse la plus élevée que l’on peut tenir environ <b>5 à 7 minutes</b>
+        en utilisant principalement la filière aérobie (avec oxygène). Elle sert en EPS à fixer des <b>allures de travail</b>
+        : par exemple courir à <b>70–90 %</b> de sa VMA selon l’objectif (entretien, progression).
+      </p>
       <ul class="list-disc ml-6 text-slate-700">
-        <li>Ex. VMA 12 km/h → 80% = 9,6 km/h → ~<b>2′38″</b> au tour de 253 m.</li>
-        <li>km/h → m/min : × 16,67 • km/h → m/s : × 0,2778.</li>
+        <li><b>Exemple :</b> VMA = 12 km/h → 80 % = 9,6 km/h. Sur un tour de 253 m, le <b>temps au tour</b> ≈ <b>2′38″</b>.</li>
+        <li>km/h → m/min : × <b>16,67</b> • km/h → m/s : × <b>0,2778</b>.</li>
       </ul>
     </div>
+
     <div>
-      <h4 class="font-semibold">🔸 Pour aller plus loin</h4>
-      <p class="text-slate-700">La VMA est liée à la <b>VO₂max</b>. Elle s’estime via Luc Léger, VAMEVAL… %VMA module la charge selon objectifs (4′ à 20′ : cardio, économie, tolérance lactique).</p>
+      <h4 class="font-semibold">🔸 Pour aller plus loin (scientifique)</h4>
+      <ul class="list-disc ml-6 text-slate-700">
+        <li>La VMA est corrélée à la <b>VO₂max</b> (quantité maximale d’oxygène utilisée par minute).</li>
+        <li>Elle s’estime via des tests progressifs (Luc Léger, VAMEVAL…).</li>
+        <li>Travailler à un <b>%VMA</b> donné module la charge : <i>~70–80 %</i> pour l’endurance aérobie, <i>~85–95 %</i> pour des efforts plus intenses.</li>
+        <li>Les adaptations visées : <b>cardio-respiratoire</b>, <b>économie de course</b>, et meilleure <b>tolérance au lactate</b>.</li>
+      </ul>
+    </div>
+
+    <div>
+      <h4 class="font-semibold">🧮 Formules utiles</h4>
+      <ul class="list-disc ml-6 text-slate-700">
+        <li><b>Vitesse à %VMA (km/h)</b> = VMA × (%/100)</li>
+        <li><b>m/s</b> = km/h × 0,2778 • <b>m/min</b> = km/h × 16,67</li>
+        <li><b>Temps au tour (s)</b> = distance_du_tour (m) ÷ vitesse (m/s)</li>
+      </ul>
     </div>
   </div>
 </div>
@@ -560,7 +584,7 @@
       <div class="text-center"><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${p.reps} × ${p.repMin}' @ ${p.pct}% (récup ${p.rec||0}')<br>
       <b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s)</div>
       <div class="overflow-auto mt-3 center-table">
-        <table class="table-auto border text-sm">
+        <table class="table-auto inline-table border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
@@ -602,7 +626,7 @@
       <div class="text-center"><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${reps} × ${repMin}' @ ${pct}% (récup ${rec}')
       <br><b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s) • <b>Durée totale :</b> ${totalTimeMin}'</div>
       <div class="overflow-auto mt-3 center-table">
-        <table class="table-auto border text-sm">
+        <table class="table-auto inline-table border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
           <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
@@ -626,7 +650,7 @@
       let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
       const html=`<div class="text-center mb-2">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
       <div class="overflow-auto center-table">
-        <table class="table-auto border text-sm">
+        <table class="table-auto inline-table border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -643,7 +667,7 @@
       let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
       const html=`<div class="text-center mb-2">Tour ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
       <div class="overflow-auto center-table">
-        <table class="table-auto border text-sm">
+        <table class="table-auto inline-table border text-sm">
           <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
@@ -672,7 +696,7 @@
         let rows=''; for(let i=1;i<=lapsThis;i++) rows+=`<tr class="border"><td class="p-2 text-center">${i}</td><td class="p-2 text-center">${toMMSS(i*lapS)}</td></tr>`;
         sections+=`<h4 class="font-semibold mt-3 text-center">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
           <div class="overflow-auto center-table">
-            <table class="table-auto border text-sm">
+            <table class="table-auto inline-table border text-sm">
               <thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
@@ -688,7 +712,6 @@
   function buildExportNode(containerId, titleText){
     const source=document.getElementById(containerId);
     const clone=source.cloneNode(true);
-    // masquer boutons d’action dans le clone
     clone.querySelectorAll('.no-print').forEach(el=>el.remove());
 
     const frame=document.createElement('div');
@@ -706,8 +729,11 @@
     const footer=document.createElement('div');
     footer.className='export-footer';
     footer.innerHTML=`
-      <div class="brand">ScanProf • Équipe EPS Lycée Vauban – Luxembourg – JB</div>
-      <div>www.eps-vauban • Partage iPad (AirDrop/Mail/Teams)</div>
+      <div class="brand">
+        <!-- <img src="logo-eps.png" alt="EPS" style="height:16px"> -->
+        ScanProf • Équipe EPS Lycée Vauban – Luxembourg – JB
+      </div>
+      <div>Partage iPad (AirDrop/Mail/Teams)</div>
     `;
     frame.appendChild(footer);
     return frame;
@@ -744,7 +770,6 @@
     const pageW=pdf.internal.pageSize.getWidth();
     const pageH=pdf.internal.pageSize.getHeight();
     const margin=24;
-    // Fit image to page with margins
     const imgW=pageW - margin*2;
     const ratio=canvas.height/canvas.width;
     const imgH=imgW*ratio;
