@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculateur Demi‑fond – VMA, % et Tours</title>
+  <title>Calculateur Demi-fond – VMA, % et Tours</title>
   <style>
     :root{
       --bg:#f6f8fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
@@ -11,6 +11,7 @@
       --radius:14px; --shadow:0 10px 30px rgba(2,6,23,.08);
     }
     *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    html,body{height:100%}
     body{margin:0;background:var(--bg);color:var(--ink)}
     .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
     header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
@@ -20,17 +21,18 @@
     .card{grid-column:span 12;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
     @media(min-width:900px){.card.half{grid-column:span 6}}
     .card h2{font-size:18px;margin:0 0 8px}
-    .row{display:grid;grid-template-columns:160px 1fr 140px;gap:10px;align-items:center;margin:10px 0}
+    .row{display:grid;grid-template-columns:160px 1fr 200px;gap:10px;align-items:center;margin:12px 0}
     .row label{color:var(--muted);font-size:14px}
-    input[type="number"], input[type="text"], select{width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#fff}
+    input[type="number"], input[type="text"], select{width:100%;padding:14px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;font-size:16px}
     .help{font-size:12px;color:var(--muted)}
-    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    button{border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;font-size:15px}
     .primary{background:var(--primary);color:#fff}
     .ghost{background:#eef2ff;color:#1e3a8a}
     .accent{background:var(--accent);color:#052e1a}
     .warn{background:#fff7ed;color:#9a3412}
     .danger{background:#fee2e2;color:#7f1d1d}
+    .tag{display:inline-block;font-size:12px;background:#e0f2fe;color:#075985;border:1px solid #bae6fd;padding:2px 8px;border-radius:999px;margin-left:8px}
     .out{margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0}
     .out b{display:inline-block;min-width:180px}
     .recap{margin-top:12px;padding:12px;border-radius:12px;background:#eef2ff;border:1px solid #c7d2fe}
@@ -39,17 +41,25 @@
     .kpi h3{margin:4px 0 0;font-size:18px}
     .kpi span{display:block;color:var(--muted);font-size:12px}
     table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #e2e8f0;padding:8px;text-align:center}
+    th,td{border:1px solid #e2e8f0;padding:10px;text-align:center}
     th{background:#f1f5f9}
     footer{margin:20px 0;color:var(--muted);font-size:12px;text-align:center}
+
+    /* Pages = colonnes flex pour footer collé en bas */
+    .page{min-height:100vh;display:flex;flex-direction:column}
+    .page > .content{flex:1;display:flex;align-items:center;justify-content:center}
+    .page footer{margin-top:auto}
+
     /* Page d'accueil centrée */
-    #home{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;text-align:center}
-    #home h1{font-size:clamp(28px,6vw,42px);margin-bottom:12px}
-    #home button{font-size:20px;padding:16px 28px;background:var(--primary);color:#fff;border-radius:16px}/* Menu */
-    #menu{display:none;min-height:100vh;align-items:center;justify-content:center}
-    .menu-grid{display:grid;grid-template-columns:repeat(1,minmax(240px,340px));gap:20px;justify-content:center}
-    @media(min-width:720px){.menu-grid{grid-template-columns:repeat(2,minmax(280px,380px));}}
-    .menu-card{border:1px solid #e2e8f0;border-radius:16px;box-shadow:var(--shadow);padding:26px;cursor:pointer;color:#fff;text-align:center;font-weight:700;font-size:18px;transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+    #home .content{flex-direction:column;gap:12px;text-align:center}
+    #home h1{font-size:clamp(28px,6vw,42px);margin:0}
+    #home .cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+
+    /* Menu */
+    #menu .content{display:block}
+    .menu-grid{display:grid;grid-template-columns:repeat(1,minmax(260px,360px));gap:20px;justify-content:center}
+    @media(min-width:720px){.menu-grid{grid-template-columns:repeat(2,minmax(280px,420px));}}
+    .menu-card{border:1px solid #e2e8f0;border-radius:16px;box-shadow:var(--shadow);padding:26px;cursor:pointer;color:#fff;text-align:center;font-weight:800;font-size:18px;transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;text-shadow:0 1px 2px rgba(0,0,0,.35)}
     .menu-card:hover{transform:translateY(-2px);filter:saturate(1.08);box-shadow:0 12px 36px rgba(2,6,23,.18)}
     .menu-card:focus-visible{outline:3px solid #fff;outline-offset:3px}
     .menu-card h3{margin:0 0 6px;color:#fff}
@@ -58,206 +68,289 @@
     .mc-B{background:#047857}
     .mc-S{background:#b45309}
     .mc-SP{background:#6d28d9}
+
+    /* Modales */
+    .modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+    .modal .box{max-width:920px;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:18px}
+    .modal h3{margin:0 0 8px}
+    .modal .close{float:right;background:#f1f5f9}
+
+    /* Impression PDF propre */
+    @media print{
+      .no-print{display:none !important}
+      body{background:#fff}
+      .card, .out, .recap{box-shadow:none}
+      .page{min-height:auto}
+      footer{margin-top:24px}
+    }
   </style>
 </head>
 <body>
 
   <!-- Page d'accueil -->
-  <div id="home">
-    <h1>Calculateur Demi‑fond</h1>
-    <p class="subtitle">Application EPS – VMA, % et Tours</p>
-    <button onclick="startApp()">🚀 Démarrer</button>
-  </div>
-  <footer>© 2025 • Calculateur Demi‑fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
-
-  <!-- Menu des options -->
-  <div id="menu" class="wrap" style="display:none">
-    <header>
-      <div>
-        <h1>Calculateur Demi‑fond</h1>
-        <div class="subtitle">Choisis un mode de calcul</div>
-      </div>
-    </header>
-    <div class="menu-grid">
-      <div class="menu-card mc-A" onclick="goto('A')">
-        <h3>À partir de la VMA et du %</h3>
-        <div class="subtitle">Temps au tour, distance, tours, passages cumulés</div>
-      </div>
-      <div class="menu-card mc-B" onclick="goto('B')">
-        <h3>À partir d’un temps ou d’une durée</h3>
-        <div class="subtitle">%VMA estimé, tours, passages cumulés</div>
-      </div>
-      <div class="menu-card mc-S" onclick="goto('S')">
-        <h3>🎯 Mode Séance (presets)</h3>
-        <div class="subtitle">Tableau cibles + passages cumulés</div>
-      </div>
-      <div class="menu-card mc-SP" onclick="goto('SP')">
-        <h3>🛠️ Séance personnalisée</h3>
-        <div class="subtitle">Crée ta séance + passages cumulés</div>
+  <div id="home" class="page">
+    <div class="content">
+      <h1>Calculateur Demi-fond</h1>
+      <p class="subtitle">Application EPS – VMA, % et Tours</p>
+      <div class="cta">
+        <button class="primary" onclick="startApp()">🚀 Démarrer</button>
+        <button class="ghost" onclick="openModal('help')">❓ Aide</button>
+        <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
       </div>
     </div>
-    <footer>© 2025 • Calculateur Demi‑fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
+    <footer>© 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
+  </div>
+
+  <!-- Menu des options -->
+  <div id="menu" class="page" style="display:none">
+    <div class="wrap content" style="align-items:flex-start;justify-content:flex-start">
+      <header style="width:100%;">
+        <div>
+          <h1>Calculateur Demi-fond</h1>
+          <div class="subtitle">Choisis un mode de calcul</div>
+        </div>
+        <div class="btns no-print">
+          <button class="ghost" onclick="goHome()">🏠 Accueil</button>
+          <button class="accent" onclick="openModal('help')">❓ Aide</button>
+          <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
+        </div>
+      </header>
+
+      <div class="menu-grid">
+        <div class="menu-card mc-A" onclick="goto('A')">
+          <h3>À partir de la VMA et du %</h3>
+          <div class="subtitle">Temps au tour, distance, tours, passages cumulés</div>
+        </div>
+        <div class="menu-card mc-B" onclick="goto('B')">
+          <h3>À partir d’un temps ou d’une durée <span class="tag">Outil avancé</span></h3>
+          <div class="subtitle">%VMA estimé, tours, passages cumulés</div>
+        </div>
+        <div class="menu-card mc-S" onclick="goto('S')">
+          <h3>🎯 Mode Séance (presets)</h3>
+          <div class="subtitle">Tableau cibles + passages cumulés</div>
+        </div>
+        <div class="menu-card mc-SP" onclick="goto('SP')">
+          <h3>🛠️ Séance personnalisée</h3>
+          <div class="subtitle">Crée ta séance + passages cumulés</div>
+        </div>
+      </div>
+    </div>
+    <footer>© 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
   </div>
 
   <!-- Application -->
-  <div id="app" class="wrap" style="display:none">
-    <header class="app-header">
-      <div>
-        <h1>Calculateur Demi‑fond</h1>
-        <div class="subtitle">Piste personnalisée (ex. 253 m) • Allure à %VMA • Tours, temps au tour, distances</div>
-      </div>
-      <div class="btns">
-        <button class="ghost" onclick="goMenu()">⬅️ Menu</button>
-        <button class="ghost" onclick="goHome()">🏠 Accueil</button>
-      </div>
-    </header>
+  <div id="app" class="page" style="display:none">
+    <div class="wrap content" style="align-items:flex-start;justify-content:flex-start">
+      <header class="app-header" style="width:100%;">
+        <div>
+          <h1>Calculateur Demi-fond</h1>
+          <div class="subtitle">Piste personnalisée (ex. 253 m) • Allure à %VMA • Tours, temps au tour, distances</div>
+        </div>
+        <div class="btns no-print">
+          <button class="ghost" onclick="goMenu()">⬅️ Menu</button>
+          <button class="ghost" onclick="goHome()">🏠 Accueil</button>
+          <button class="accent" onclick="openModal('help')">❓ Aide</button>
+          <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
+          <button class="primary" onclick="exportPDF()">🧾 Partager en PDF</button>
+        </div>
+      </header>
 
-    <div class="grid">
+      <!-- Paramètre global : Distance d'un tour -->
+      <section class="card" style="width:100%;margin-bottom:8px">
+        <h2>⚙️ Paramètres généraux</h2>
+        <div class="row">
+          <label for="lapGlobal">Distance d’un tour (m)</label>
+          <input id="lapGlobal" type="number" min="50" step="1" value="253" oninput="syncLap()" />
+          <div class="help">S’applique à tous les modes (A, B, Séance, Perso)</div>
+        </div>
+      </section>
 
-      <!-- Bloc A : À partir de VMA & % -->
-      <section class="card half" data-page="A" style="display:none">
-        <h2>A. À partir de la VMA et du %</h2>
-        <div class="row">
-          <label for="lap">Distance d’un tour (m)</label>
-          <input id="lap" type="number" min="50" step="1" value="253" />
-          <div class="help">ex. 253</div>
-        </div>
-        <div class="row">
-          <label for="vma">VMA (km/h)</label>
-          <input id="vma" type="number" min="6" max="25" step="0.1" value="12" />
-          <div class="help">VMA mesurée (Luc Léger, VAMEVAL…)</div>
-        </div>
-        <div class="row">
-          <label for="pct">Intensité (% VMA)</label>
-          <input id="pct" type="number" min="50" max="110" step="1" value="80" />
-          <div class="help">Généralement 70–90 %</div>
-        </div>
-        <div class="row">
-          <label for="dur">Durée de l’effort (min)</label>
-          <input id="dur" type="number" min="1" step="1" value="15" />
+      <div class="grid">
+
+        <!-- Bloc A : À partir de VMA & % -->
+        <section class="card half" data-page="A" style="display:none">
+          <h2>A. À partir de la VMA et du %</h2>
+          <div class="row">
+            <label for="lap">Distance d’un tour (m)</label>
+            <input id="lap" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)" />
+            <div class="help">ex. 253</div>
+          </div>
+          <div class="row">
+            <label for="vma">VMA (km/h)</label>
+            <input id="vma" type="number" min="6" max="25" step="0.1" value="12" />
+            <div class="help">VMA mesurée (Luc Léger, VAMEVAL…)</div>
+          </div>
+          <div class="row">
+            <label for="pct">Intensité (% VMA)</label>
+            <input id="pct" type="number" min="50" max="110" step="1" value="80" />
+            <div class="help">Généralement 70–90 %</div>
+          </div>
+          <div class="row">
+            <label for="dur">Durée de l’effort (min)</label>
+            <input id="dur" type="number" min="1" step="1" value="15" />
+            <div class="btns">
+              <button class="ghost" onclick="setDur(12)">12 min</button>
+              <button class="ghost" onclick="setDur(15)">15 min</button>
+              <button class="ghost" onclick="setDur(20)">20 min</button>
+            </div>
+          </div>
           <div class="btns">
-            <button class="ghost" onclick="setDur(12)">12 min</button>
-            <button class="ghost" onclick="setDur(15)">15 min</button>
-            <button class="ghost" onclick="setDur(20)">20 min</button>
+            <button class="primary" onclick="calcFromVMA()">Calculer</button>
+            <button class="accent" onclick="buildPassages('A')">Passages cumulés</button>
+            <button class="danger" onclick="resetA()">Réinitialiser</button>
+            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
           </div>
-        </div>
-        <div class="btns">
-          <button class="primary" onclick="calcFromVMA()">Calculer</button>
-          <button class="accent" onclick="buildPassages('A')">Passages cumulés</button>
-          <button class="danger" onclick="resetA()">Réinitialiser</button>
-          <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-        </div>
-        <div id="outA" class="out" hidden></div>
-        <div id="passA" class="out" hidden></div>
-        <div id="recapA" class="recap" hidden>
-          <h3>Récapitulatif</h3>
-          <div class="kpi">
-            <div><span>Allure (m/min)</span><h3 id="k1">—</h3></div>
-            <div><span>Allure (km/h)</span><h3 id="k2">—</h3></div>
-            <div><span>Temps au tour</span><h3 id="k3">—</h3></div>
-            <div><span>Tours sur la durée</span><h3 id="k4">—</h3></div>
+          <div id="outA" class="out" hidden></div>
+          <div id="passA" class="out" hidden></div>
+          <div id="recapA" class="recap" hidden>
+            <h3>Récapitulatif</h3>
+            <div class="kpi">
+              <div><span>Allure (m/min)</span><h3 id="k1">—</h3></div>
+              <div><span>Allure (km/h)</span><h3 id="k2">—</h3></div>
+              <div><span>Temps au tour</span><h3 id="k3">—</h3></div>
+              <div><span>Tours sur la durée</span><h3 id="k4">—</h3></div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Bloc B : À partir d’un temps ou d’une durée globale -->
-      <section class="card half" data-page="B" style="display:none">
-        <h2>B. À partir d’un temps ou d’une durée → tours & %VMA</h2>
-        <div class="row">
-          <label for="lap2">Distance d’un tour (m)</label>
-          <input id="lap2" type="number" min="50" step="1" value="253" />
-          <div class="help">ex. 253</div>
-        </div>
-        <div class="row">
-          <label for="vma2">VMA (km/h)</label>
-          <input id="vma2" type="number" min="6" max="25" step="0.1" value="12" />
-          <div class="help">Pour estimer le %VMA</div>
-        </div>
-        <div class="row">
-          <label for="lapTime">Temps au tour (mm:ss)</label>
-          <input id="lapTime" type="text" placeholder="01:40" />
-          <div class="help">Option 1 : indique un temps au tour</div>
-        </div>
-        <div class="row">
-          <label for="dur2">Durée totale (min)</label>
-          <input id="dur2" type="number" min="1" step="1" value="15" />
-          <div class="help">Option 2 : indique une durée pour obtenir le nombre de tours</div>
-        </div>
-        <div class="btns">
-          <button class="primary" onclick="calcFromTime()">Calculer</button>
-          <button class="accent" onclick="buildPassages('B')">Passages cumulés</button>
-          <button class="danger" onclick="resetB()">Réinitialiser</button>
-          <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-        </div>
-        <div id="outB" class="out" hidden></div>
-        <div id="passB" class="out" hidden></div>
-        <div id="recapB" class="recap" hidden>
-          <h3>Récapitulatif</h3>
-          <div id="recapBContent">—</div>
-        </div>
-      </section>
-
-      <!-- Bloc S : Mode Séance (presets) -->
-      <section class="card" data-page="S" style="display:none">
-        <h2>🎯 Mode Séance (presets)</h2>
-        <div class="row" style="grid-template-columns:220px 1fr 340px">
-          <label for="preset">Choisir une séance type</label>
-          <select id="preset">
-            <option value="">— Sélectionne —</option>
-            <option value="2x6-80-3">2 × 6' @80% (récup 3')</option>
-            <option value="3x6-85-3">3 × 6' @85% (récup 3')</option>
-            <option value="4x4-90-2">4 × 4' @90% (récup 2')</option>
-            <option value="12x1-80-0">12' continu @80%</option>
-            <option value="15x1-80-0">15' projet @80%</option>
-            <option value="20x1-80-0">20' projet @80%</option>
-          </select>
+        <!-- Bloc B : À partir d’un temps/durée -->
+        <section class="card half" data-page="B" style="display:none">
+          <h2>B. À partir d’un temps ou d’une durée <span class="tag">Outil avancé</span></h2>
+          <div class="row">
+            <label for="lap2">Distance d’un tour (m)</label>
+            <input id="lap2" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)" />
+            <div class="help">ex. 253</div>
+          </div>
+          <div class="row">
+            <label for="vma2">VMA (km/h)</label>
+            <input id="vma2" type="number" min="6" max="25" step="0.1" value="12" />
+            <div class="help">Pour estimer le %VMA</div>
+          </div>
+          <div class="row">
+            <label for="lapTime">Temps au tour (mm:ss)</label>
+            <input id="lapTime" type="text" placeholder="01:40" />
+            <div class="help">Option 1 : indique un temps au tour</div>
+          </div>
+          <div class="row">
+            <label for="dur2">Durée totale (min)</label>
+            <input id="dur2" type="number" min="1" step="1" value="15" />
+            <div class="help">Option 2 : indique une durée pour obtenir le nombre de tours</div>
+          </div>
           <div class="btns">
-            <button class="primary" onclick="buildSession()">Générer cibles</button>
-            <button class="ghost" onclick="applyToInputs()">🔁 Appliquer aux champs</button>
-            <button class="accent" onclick="buildPassages('S')">Passages cumulés</button>
+            <button class="primary" onclick="calcFromTime()">Calculer</button>
+            <button class="accent" onclick="buildPassages('B')">Passages cumulés</button>
+            <button class="danger" onclick="resetB()">Réinitialiser</button>
+            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
           </div>
-        </div>
-        <div id="outS" class="out" hidden></div>
-        <div id="passS" class="out" hidden></div>
-      </section>
+          <div id="outB" class="out" hidden></div>
+          <div id="passB" class="out" hidden></div>
+          <div id="recapB" class="recap" hidden>
+            <h3>Récapitulatif</h3>
+            <div id="recapBContent">—</div>
+          </div>
+        </section>
 
-      <!-- Bloc SP : Séance personnalisée -->
-      <section class="card" data-page="SP" style="display:none">
-        <h2>🛠️ Séance personnalisée</h2>
-        <div class="row" style="grid-template-columns:200px repeat(3,1fr)">
-          <label for="repCount">Répétitions × durée (min)</label>
-          <input id="repCount" type="number" min="1" step="1" value="3" />
-          <input id="repMin" type="number" min="1" step="1" value="6" />
-          <div class="help">ex. 3 × 6'</div>
-        </div>
-        <div class="row">
-          <label for="pctP">Intensité (% VMA)</label>
-          <input id="pctP" type="number" min="50" max="110" step="1" value="80" />
-          <div class="help">généralement 70–90 %</div>
-        </div>
-        <div class="row">
-          <label for="recP">Récupération (min)</label>
-          <input id="recP" type="number" min="0" step="0.5" value="3" />
-          <div class="help">entre les répétitions</div>
-        </div>
-        <div class="btns">
-          <button class="primary" onclick="buildCustom()">Calculer la séance</button>
-          <button class="accent" onclick="buildPassages('SP')">Passages cumulés</button>
-          <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-        </div>
-        <div id="outSP" class="out" hidden></div>
-        <div id="passSP" class="out" hidden></div>
-      </section>
+        <!-- Bloc S : Mode Séance (presets) -->
+        <section class="card" data-page="S" style="display:none">
+          <h2>🎯 Mode Séance (presets)</h2>
+          <div class="row" style="grid-template-columns:220px 1fr 340px">
+            <label for="preset">Choisir une séance type</label>
+            <select id="preset">
+              <option value="">— Sélectionne —</option>
+              <option value="2x6-80-3">2 × 6' @80% (récup 3')</option>
+              <option value="3x6-85-3">3 × 6' @85% (récup 3')</option>
+              <option value="4x4-90-2">4 × 4' @90% (récup 2')</option>
+              <option value="12x1-80-0">12' continu @80%</option>
+              <option value="15x1-80-0">15' projet @80%</option>
+              <option value="20x1-80-0">20' projet @80%</option>
+            </select>
+            <div class="btns">
+              <button class="primary" onclick="buildSession()">Générer cibles</button>
+              <button class="ghost" onclick="applyToInputs()">🔁 Appliquer aux champs</button>
+              <button class="accent" onclick="buildPassages('S')">Passages cumulés</button>
+            </div>
+          </div>
+          <div id="outS" class="out" hidden></div>
+          <div id="passS" class="out" hidden></div>
+        </section>
 
+        <!-- Bloc SP : Séance personnalisée -->
+        <section class="card" data-page="SP" style="display:none">
+          <h2>🛠️ Séance personnalisée</h2>
+          <div class="row" style="grid-template-columns:200px repeat(3,1fr)">
+            <label for="repCount">Répétitions × durée (min)</label>
+            <input id="repCount" type="number" min="1" step="1" value="3" />
+            <input id="repMin" type="number" min="1" step="1" value="6" />
+            <div class="help">ex. 3 × 6'</div>
+          </div>
+          <div class="row">
+            <label for="pctP">Intensité (% VMA)</label>
+            <input id="pctP" type="number" min="50" max="110" step="1" value="80" />
+            <div class="help">généralement 70–90 %</div>
+          </div>
+          <div class="row">
+            <label for="recP">Récupération (min)</label>
+            <input id="recP" type="number" min="0" step="0.5" value="3" />
+            <div class="help">entre les répétitions</div>
+          </div>
+          <div class="btns">
+            <button class="primary" onclick="buildCustom()">Calculer la séance</button>
+            <button class="accent" onclick="buildPassages('SP')">Passages cumulés</button>
+            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
+          </div>
+          <div id="outSP" class="out" hidden></div>
+          <div id="passSP" class="out" hidden></div>
+        </section>
+
+      </div>
     </div>
 
     <footer>
-      © 2025 • Calculateur Demi‑fond – Équipe EPS Lycée Vauban Luxembourg – JB
+      © 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB
     </footer>
   </div>
 
+  <!-- Modale AIDE -->
+  <div id="modal-help" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="box">
+      <button class="close no-print" onclick="closeModal('help')">✕</button>
+      <h3 id="help-title">Aide — Comment utiliser l’application</h3>
+      <ol style="line-height:1.6;color:#334155;margin:0;padding-left:18px">
+        <li><b>Démarre</b>, choisis un <b>mode</b> (VMA & %, Temps/Durée, Séance, Perso).</li>
+        <li>Règle la <b>Distance d’un tour</b> (ex. 253 m) — s’applique partout.</li>
+        <li>Entre la <b>VMA</b> et le <b>%</b> (ou un <b>temps au tour</b> en mode avancé).</li>
+        <li>Appuie sur <b>Calculer</b> puis sur <b>Passages cumulés</b> pour la table des temps.</li>
+        <li>Utilise <b>Partager en PDF</b> pour envoyer aux élèves (AirDrop/Mail/Teams).</li>
+      </ol>
+      <p class="help" style="margin-top:8px">Astuce : le bloc “Temps ou durée” est utile si tu connais un <i>temps au tour</i> mais pas le %VMA.</p>
+    </div>
+  </div>
+
+  <!-- Modale INFO VMA -->
+  <div id="modal-vma" class="modal" role="dialog" aria-modal="true" aria-labelledby="vma-title">
+    <div class="box">
+      <button class="close no-print" onclick="closeModal('vma')">✕</button>
+      <h3 id="vma-title">Infos VMA — Explications simples, puis pour aller plus loin</h3>
+      <h4>🔹 Version simple</h4>
+      <p style="margin:6px 0 10px;color:#334155;line-height:1.6">
+        La <b>VMA</b> (Vitesse Maximale Aérobie) est la vitesse de course maximale qu’on peut tenir environ <b>5–7 minutes</b>.
+        En cours d’EPS, on s’en sert pour fixer des <b>allures de travail</b> (par ex. courir à 80% de sa VMA).
+      </p>
+      <ul style="margin:0 0 12px 18px;color:#334155;line-height:1.6">
+        <li>Ex. VMA = 12 km/h → 80% = 9,6 km/h → ~<b>2′38″</b> au tour de 253 m.</li>
+        <li>Vitesse (km/h) → m/min : multiplie par <b>1000/60</b> ; m/s : multiplie par <b>1000/3600</b>.</li>
+      </ul>
+      <h4>🔸 Pour aller plus loin (scientifique)</h4>
+      <p style="margin:6px 0 0;color:#334155;line-height:1.6">
+        La VMA est liée à la <b>VO₂max</b> (consommation maximale d’oxygène). On l’estime via des tests (Luc Léger, VAMEVAL…).
+        L’allure à %VMA suppose un <b>coût énergétique</b> stable et une <b>cinétique</b> d’oxygénation suffisante ; les durées ciblées (4′ à 20′)
+        orientent le type d’adaptation (cardio, économie de course, tolérance lactique).
+      </p>
+    </div>
+  </div>
+
 <script>
-  // Nav
+  // ----- Nav
   function startApp(){
     document.getElementById('home').style.display = 'none';
     document.getElementById('menu').style.display = 'block';
@@ -278,10 +371,23 @@
   function goHome(){
     document.getElementById('app').style.display = 'none';
     document.getElementById('menu').style.display = 'none';
-    document.getElementById('home').style.display = 'flex';
+    document.getElementById('home').style.display = 'block';
   }
 
-  // Utils
+  // ----- Modales
+  function openModal(which){
+    const id = which==='help' ? 'modal-help' : 'modal-vma';
+    document.getElementById(id).style.display='flex';
+  }
+  function closeModal(which){
+    const id = which==='help' ? 'modal-help' : 'modal-vma';
+    document.getElementById(id).style.display='none';
+  }
+  window.addEventListener('keydown', e=>{
+    if(e.key==='Escape'){ document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
+  });
+
+  // ----- Utils
   const toSeconds = (mmss) => {
     if(!mmss) return NaN;
     const parts = mmss.split(":").map(Number);
@@ -298,7 +404,22 @@
   const round = (x, d=2) => Number.isFinite(x) ? Number(x.toFixed(d)) : NaN;
   function setDur(val){ document.getElementById('dur').value = val; }
 
-  // Bloc A – VMA & %
+  // ----- Paramètre global de piste
+  function syncLap(){
+    const v = parseFloat(document.getElementById('lapGlobal').value)||253;
+    ['lap','lap2'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.value = v;
+    });
+  }
+  function syncLapFromLocal(val){
+    const v = parseFloat(val)||253;
+    const g = document.getElementById('lapGlobal');
+    if(g && g.value!=v) g.value = v;
+    syncLap(); // propage
+  }
+
+  // ----- Bloc A – VMA & %
   function calcFromVMA(){
     const lap = parseFloat(document.getElementById('lap').value);
     const vma = parseFloat(document.getElementById('vma').value);
@@ -329,7 +450,7 @@
     document.getElementById('recapA').hidden = false;
   }
   function resetA(){
-    document.getElementById('lap').value = 253;
+    document.getElementById('lap').value = document.getElementById('lapGlobal').value || 253;
     document.getElementById('vma').value = 12;
     document.getElementById('pct').value = 80;
     document.getElementById('dur').value = 15;
@@ -338,7 +459,7 @@
     document.getElementById('passA').hidden = true;
   }
 
-  // Bloc B – Temps ou durée
+  // ----- Bloc B – Temps ou durée
   function calcFromTime(){
     const lap = parseFloat(document.getElementById('lap2').value);
     const vma = parseFloat(document.getElementById('vma2').value);
@@ -377,7 +498,7 @@
     document.getElementById('recapB').hidden = false;
   }
   function resetB(){
-    document.getElementById('lap2').value = 253;
+    document.getElementById('lap2').value = document.getElementById('lapGlobal').value || 253;
     document.getElementById('vma2').value = 12;
     document.getElementById('lapTime').value = '';
     document.getElementById('dur2').value = 15;
@@ -386,7 +507,7 @@
     document.getElementById('passB').hidden = true;
   }
 
-  // Presets séance
+  // ----- Presets séance
   function parsePreset(code){
     if(!code) return null;
     const [left, right] = code.split('-');
@@ -400,7 +521,7 @@
     const sel = document.getElementById('preset').value;
     if(!sel){ alert('Choisis une séance.'); return; }
     const preset = parsePreset(sel);
-    const lap = parseFloat(document.getElementById('lap').value) || 253;
+    const lap = parseFloat(document.getElementById('lap').value) || 253; // global déjà synchronisé
     const vma = parseFloat(document.getElementById('vma').value) || 12;
     const v_kmh = vma * (preset.pct/100);
     const v_mps = v_kmh * 1000 / 3600;
@@ -442,7 +563,7 @@
     calcFromVMA();
   }
 
-  // Séance personnalisée
+  // ----- Séance personnalisée
   function buildCustom(){
     const lap = parseFloat(document.getElementById('lap').value) || 253;
     const vma = parseFloat(document.getElementById('vma').value) || 12;
@@ -485,7 +606,7 @@
     out.innerHTML = html;
   }
 
-  // Passages cumulés (A, B, S, SP)
+  // ----- Passages cumulés (A, B, S, SP)
   function buildPassages(kind){
     if(kind==='A'){
       const lap = parseFloat(document.getElementById('lap').value);
@@ -549,6 +670,11 @@
       const id = isPreset ? 'passS' : 'passSP';
       const box = document.getElementById(id); box.hidden=false; box.innerHTML=html;
     }
+  }
+
+  // ----- Export PDF (impression propre → iPad partage)
+  function exportPDF(){
+    window.print();
   }
 </script>
 </body>
