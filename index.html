@@ -17,12 +17,14 @@
   .min-h-app{min-height:100vh;display:flex;flex-direction:column}
   .app-content{flex:1}
   .print-card{background:#fff;border:1px solid rgb(226 232 240);border-radius:16px;padding:16px}
+
   /* --- Centrage béton des tableaux --- */
   .center-table{display:flex;justify-content:center;width:100%}
   .center-table > table{width:auto;margin:0 auto}
   .center-table table{table-layout:auto}
-  .center-table th, .center-table td{text-align:center}
-  /* Gabarit export pro */
+  .center-table th,.center-table td{text-align:center}
+
+  /* --- Export pro --- */
   .export-frame{
     width:794px; max-width:100%;
     background:#ffffff;border:1px solid #e5e7eb;border-radius:16px;
@@ -33,6 +35,7 @@
   .export-footer{border-top:1px solid #e5e7eb;margin-top:14px;padding-top:8px;
     font-size:11px;color:#64748b;display:flex;justify-content:space-between;align-items:center}
   .brand{font-weight:600;color:#334155;display:flex;align-items:center;gap:8px}
+
   @media print{ .no-print{display:none!important} body{background:#fff} .print-card{border:0;border-radius:0;padding:0} }
 </style>
 </head>
@@ -124,14 +127,15 @@
       </div>
     </div>
 
-    <!-- Grille des blocs -->
-    <div class="grid lg:grid-cols-2 gap-6">
+    <!-- Grille des blocs (centrée) -->
+    <div class="grid lg:grid-cols-2 gap-6 place-items-center">
 
-      <!-- Bloc A -->
-      <div class="rounded-2xl bg-white shadow p-5" data-page="A">
-        <h3 class="font-semibold text-lg mb-4">A. À partir de la VMA et du %</h3>
+      <!-- Bloc A (carte centrée) -->
+      <div class="w-full max-w-2xl rounded-2xl bg-white shadow p-5" data-page="A">
+        <h3 class="font-semibold text-lg mb-4 text-center">A. À partir de la VMA et du %</h3>
 
-        <div class="grid gap-4">
+        <!-- zone paramètres centrée -->
+        <div class="grid gap-4 max-w-lg mx-auto">
           <label class="block">
             <span class="text-sm text-slate-600">Distance d’un tour (m)</span>
             <input id="lap" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)"
@@ -156,63 +160,67 @@
             </label>
           </div>
 
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 justify-center">
             <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(12)">12 min</button>
             <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(15)">15 min</button>
             <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(20)">20 min</button>
           </div>
 
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 justify-center">
             <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="calcFromVMA()">Calculer</button>
             <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('A')">Passages cumulés</button>
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetA()">Réinitialiser</button>
           </div>
+        </div>
 
-          <!-- Résultats A -->
-          <div id="outA" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
+        <!-- Résultats A -->
+        <div id="outA" class="hidden max-w-3xl mx-auto mt-4 print-card text-sm"></div>
 
-          <div id="recapA" class="hidden max-w-3xl mx-auto print-card">
-            <div class="flex items-center justify-between gap-2 mb-3 no-print">
-              <h4 class="font-semibold">Récapitulatif</h4>
-              <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapA','recap-A.png','Récapitulatif')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapA','recap-A.pdf','Récapitulatif')">🧾 PDF</button>
-              </div>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <div class="rounded-lg bg-white border p-3 text-center">
-                <div class="text-slate-500 text-xs">Allure (m/min)</div><div id="k1" class="text-lg font-bold">—</div>
-              </div>
-              <div class="rounded-lg bg-white border p-3 text-center">
-                <div class="text-slate-500 text-xs">Allure (km/h)</div><div id="k2" class="text-lg font-bold">—</div>
-              </div>
-              <div class="rounded-lg bg-white border p-3 text-center">
-                <div class="text-slate-500 text-xs">Temps au tour</div><div id="k3" class="text-lg font-bold">—</div>
-              </div>
-              <div class="rounded-lg bg-white border p-3 text-center">
-                <div class="text-slate-500 text-xs">Tours (durée)</div><div id="k4" class="text-lg font-bold">—</div>
-              </div>
+        <div id="recapA" class="hidden max-w-3xl mx-auto mt-4 print-card">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Récapitulatif</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapA','recap-A.png','Récapitulatif')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapA','recap-A.pdf','Récapitulatif')">🧾 PDF</button>
             </div>
           </div>
-
-          <div id="passA" class="hidden max-w-3xl mx-auto print-card">
-            <div class="flex items-center justify-between gap-2 mb-3 no-print">
-              <h4 class="font-semibold">Passages cumulés</h4>
-              <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passA','passages-A.png','Passages cumulés')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passA','passages-A.pdf','Passages cumulés')">🧾 PDF</button>
-              </div>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="rounded-lg bg-white border p-3 text-center">
+              <div class="text-slate-500 text-xs">Allure (m/min)</div><div id="k1" class="text-lg font-bold">—</div>
             </div>
-            <div id="passAContent" class="center-table overflow-auto"></div>
+            <div class="rounded-lg bg-white border p-3 text-center">
+              <div class="text-slate-500 text-xs">Allure (km/h)</div><div id="k2" class="text-lg font-bold">—</div>
+            </div>
+            <div class="rounded-lg bg-white border p-3 text-center">
+              <div class="text-slate-500 text-xs">Temps au tour</div><div id="k3" class="text-lg font-bold">—</div>
+            </div>
+            <div class="rounded-lg bg-white border p-3 text-center">
+              <div class="text-slate-500 text-xs">Tours (durée)</div><div id="k4" class="text-lg font-bold">—</div>
+            </div>
           </div>
+        </div>
+
+        <div id="passA" class="hidden max-w-3xl mx-auto mt-4 print-card">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Passages cumulés</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passA','passages-A.png','Passages cumulés')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passA','passages-A.pdf','Passages cumulés')">🧾 PDF</button>
+            </div>
+          </div>
+          <div id="passAContent" class="center-table overflow-auto"></div>
         </div>
       </div>
 
-      <!-- Bloc B -->
-      <div class="rounded-2xl bg-white shadow p-5" data-page="B">
-        <h3 class="font-semibold text-lg mb-4">B. À partir d’un temps/durée <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-100">Outil avancé</span></h3>
+      <!-- Bloc B (carte centrée) -->
+      <div class="w-full max-w-2xl rounded-2xl bg-white shadow p-5" data-page="B">
+        <h3 class="font-semibold text-lg mb-4 text-center">
+          B. À partir d’un temps/durée
+          <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-100">Outil avancé</span>
+        </h3>
 
-        <div class="grid gap-4">
+        <!-- zone paramètres centrée -->
+        <div class="grid gap-4 max-w-lg mx-auto">
           <label class="block">
             <span class="text-sm text-slate-600">Distance d’un tour (m)</span>
             <input id="lap2" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)"
@@ -237,39 +245,39 @@
             </label>
           </div>
 
-          <div class="flex flex-wrap gap-2">
+          <div class="flex flex-wrap gap-2 justify-center">
             <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="calcFromTime()">Calculer</button>
             <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('B')">Passages cumulés</button>
             <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetB()">Réinitialiser</button>
           </div>
+        </div>
 
-          <div id="outB" class="hidden max-w-3xl mx-auto print-card text-sm"></div>
+        <div id="outB" class="hidden max-w-3xl mx-auto mt-4 print-card text-sm"></div>
 
-          <div id="recapB" class="hidden max-w-3xl mx-auto print-card">
-            <div class="flex items-center justify-between gap-2 mb-3 no-print">
-              <h4 class="font-semibold">Récapitulatif</h4>
-              <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapB','recap-B.png','Récapitulatif')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapB','recap-B.pdf','Récapitulatif')">🧾 PDF</button>
-              </div>
+        <div id="recapB" class="hidden max-w-3xl mx-auto mt-4 print-card">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Récapitulatif</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('recapB','recap-B.png','Récapitulatif')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('recapB','recap-B.pdf','Récapitulatif')">🧾 PDF</button>
             </div>
-            <div id="recapBContent">—</div>
           </div>
+          <div id="recapBContent">—</div>
+        </div>
 
-          <div id="passB" class="hidden max-w-3xl mx-auto print-card">
-            <div class="flex items-center justify-between gap-2 mb-3 no-print">
-              <h4 class="font-semibold">Passages cumulés</h4>
-              <div class="flex gap-2">
-                <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passB','passages-B.png','Passages cumulés')">📸 PNG</button>
-                <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passB','passages-B.pdf','Passages cumulés')">🧾 PDF</button>
-              </div>
+        <div id="passB" class="hidden max-w-3xl mx-auto mt-4 print-card">
+          <div class="flex items-center justify-between gap-2 mb-3 no-print">
+            <h4 class="font-semibold">Passages cumulés</h4>
+            <div class="flex gap-2">
+              <button class="px-3 py-1.5 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="sharePNG('passB','passages-B.png','Passages cumulés')">📸 PNG</button>
+              <button class="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="sharePDF('passB','passages-B.pdf','Passages cumulés')">🧾 PDF</button>
             </div>
-            <div id="passBContent" class="center-table overflow-auto"></div>
           </div>
+          <div id="passBContent" class="center-table overflow-auto"></div>
         </div>
       </div>
 
-      <!-- Bloc S -->
+      <!-- Bloc S (séance presets) -->
       <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="S">
         <h3 class="font-semibold text-lg mb-4">🎯 Mode Séance (presets)</h3>
         <div class="grid sm:grid-cols-3 gap-4 items-end">
@@ -313,7 +321,7 @@
         </div>
       </div>
 
-      <!-- Bloc SP -->
+      <!-- Bloc SP (séance perso) -->
       <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="SP">
         <h3 class="font-semibold text-lg mb-4">🛠️ Séance personnalisée</h3>
         <div class="grid sm:grid-cols-4 gap-4">
@@ -415,8 +423,8 @@
       <ul class="list-disc ml-6 text-slate-700">
         <li>La VMA est corrélée à la <b>VO₂max</b> (quantité maximale d’oxygène utilisée par minute).</li>
         <li>Elle s’estime via des tests progressifs (Luc Léger, VAMEVAL…).</li>
-        <li>Travailler à un <b>%VMA</b> donné module la charge : <i>~70–80 %</i> pour l’endurance aérobie, <i>~85–95 %</i> pour des efforts plus intenses.</li>
-        <li>Les adaptations visées : <b>cardio-respiratoire</b>, <b>économie de course</b>, et meilleure <b>tolérance au lactate</b>.</li>
+        <li>Travailler à un <b>%VMA</b> donné module la charge : ~<i>70–80 %</i> pour l’endurance aérobie, ~<i>85–95 %</i> pour des efforts plus intenses.</li>
+        <li>Adaptations visées : <b>cardio-respiratoire</b>, <b>économie de course</b>, <b>tolérance au lactate</b>.</li>
       </ul>
     </div>
 
