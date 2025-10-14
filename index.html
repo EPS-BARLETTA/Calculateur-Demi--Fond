@@ -1,261 +1,233 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calculateur Demi-fond – VMA, % et Tours</title>
-  <style>
-    :root{
-      --bg:#f6f8fb; --card:#ffffff; --ink:#0f172a; --muted:#64748b;
-      --primary:#2563eb; --accent:#10b981; --warn:#f59e0b; --danger:#ef4444;
-      --radius:14px; --shadow:0 10px 30px rgba(2,6,23,.08);
-    }
-    *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink)}
-    .wrap{max-width:1100px;margin:32px auto;padding:0 16px}
-    header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:clamp(20px,3vw,28px);margin:0}
-    .subtitle{color:var(--muted);font-size:14px}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-    .card{grid-column:span 12;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-    @media(min-width:900px){.card.half{grid-column:span 6}}
-    .card h2{font-size:18px;margin:0 0 8px}
-    .row{display:grid;grid-template-columns:160px 1fr 200px;gap:10px;align-items:center;margin:12px 0}
-    .row label{color:var(--muted);font-size:14px}
-    input[type="number"], input[type="text"], select{width:100%;padding:14px 14px;border:1px solid #e5e7eb;border-radius:12px;background:#fff;font-size:16px}
-    .help{font-size:12px;color:var(--muted)}
-    .btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    button{border:0;border-radius:12px;padding:12px 16px;font-weight:700;cursor:pointer;font-size:15px}
-    .primary{background:var(--primary);color:#fff}
-    .ghost{background:#eef2ff;color:#1e3a8a}
-    .accent{background:var(--accent);color:#052e1a}
-    .warn{background:#fff7ed;color:#9a3412}
-    .danger{background:#fee2e2;color:#7f1d1d}
-    .tag{display:inline-block;font-size:12px;background:#e0f2fe;color:#075985;border:1px solid #bae6fd;padding:2px 8px;border-radius:999px;margin-left:8px}
-    .out{margin-top:12px;padding:12px;border-radius:12px;background:#f8fafc;border:1px solid #e2e8f0}
-    .out b{display:inline-block;min-width:180px}
-    .recap{margin-top:12px;padding:12px;border-radius:12px;background:#eef2ff;border:1px solid #c7d2fe}
-    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
-    .kpi div{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;padding:10px;text-align:center}
-    .kpi h3{margin:4px 0 0;font-size:18px}
-    .kpi span{display:block;color:var(--muted);font-size:12px}
-    table{width:100%;border-collapse:collapse}
-    th,td{border:1px solid #e2e8f0;padding:10px;text-align:center}
-    th{background:#f1f5f9}
-    footer{margin:20px 0;color:var(--muted);font-size:12px;text-align:center}
-
-    /* Pages = colonnes flex pour footer collé en bas */
-    .page{min-height:100vh;display:flex;flex-direction:column}
-    .page > .content{flex:1;display:flex;align-items:center;justify-content:center}
-    .page footer{margin-top:auto}
-
-    /* Page d'accueil centrée */
-    #home .content{flex-direction:column;gap:12px;text-align:center}
-    #home h1{font-size:clamp(28px,6vw,42px);margin:0}
-    #home .cta{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-
-    /* Menu */
-    #menu .content{display:block}
-    .menu-grid{display:grid;grid-template-columns:repeat(1,minmax(260px,360px));gap:20px;justify-content:center}
-    @media(min-width:720px){.menu-grid{grid-template-columns:repeat(2,minmax(280px,420px));}}
-    .menu-card{border:1px solid #e2e8f0;border-radius:16px;box-shadow:var(--shadow);padding:26px;cursor:pointer;color:#fff;text-align:center;font-weight:800;font-size:18px;transition:transform .12s ease, filter .12s ease, box-shadow .12s ease;text-shadow:0 1px 2px rgba(0,0,0,.35)}
-    .menu-card:hover{transform:translateY(-2px);filter:saturate(1.08);box-shadow:0 12px 36px rgba(2,6,23,.18)}
-    .menu-card:focus-visible{outline:3px solid #fff;outline-offset:3px}
-    .menu-card h3{margin:0 0 6px;color:#fff}
-    .menu-card .subtitle{color:rgba(255,255,255,.92);font-weight:600}
-    .mc-A{background:#1e40af}
-    .mc-B{background:#047857}
-    .mc-S{background:#b45309}
-    .mc-SP{background:#6d28d9}
-
-    /* Modales */
-    .modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
-    .modal .box{max-width:920px;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:18px}
-    .modal h3{margin:0 0 8px}
-    .modal .close{float:right;background:#f1f5f9}
-
-    /* Impression PDF propre */
-    @media print{
-      .no-print{display:none !important}
-      body{background:#fff}
-      .card, .out, .recap{box-shadow:none}
-      .page{min-height:auto}
-      footer{margin-top:24px}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculateur Demi-fond</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  html,body{height:100%}
+  .min-h-app{min-height:100vh;display:flex;flex-direction:column}
+  .app-content{flex:1}
+  @media print{
+    .no-print{display:none!important}
+    body{background:#fff}
+  }
+</style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-app">
 
-  <!-- Page d'accueil -->
-  <div id="home" class="page">
-    <div class="content">
-      <h1>Calculateur Demi-fond</h1>
-      <p class="subtitle">Application EPS – VMA, % et Tours</p>
-      <div class="cta">
-        <button class="primary" onclick="startApp()">🚀 Démarrer</button>
-        <button class="ghost" onclick="openModal('help')">❓ Aide</button>
-        <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
+<!-- ACCUEIL -->
+<section id="home" class="app-content flex items-center justify-center p-6">
+  <div class="w-full max-w-2xl text-center space-y-6">
+    <h1 class="text-4xl font-extrabold tracking-tight">Calculateur Demi-fond</h1>
+    <p class="text-slate-600">VMA • %VMA • Temps au tour • Passages cumulés</p>
+    <div class="flex flex-wrap items-center justify-center gap-3">
+      <button class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow hover:bg-blue-700"
+              onclick="startApp()">🚀 Démarrer</button>
+      <button class="px-5 py-3 rounded-xl bg-violet-100 text-violet-900 font-semibold hover:bg-violet-200"
+              onclick="openModal('help')">❓ Aide</button>
+      <button class="px-5 py-3 rounded-xl bg-emerald-100 text-emerald-900 font-semibold hover:bg-emerald-200"
+              onclick="openModal('vma')">ℹ️ Infos VMA</button>
+    </div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section id="menu" class="hidden app-content p-6">
+  <div class="mx-auto max-w-5xl">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h2 class="text-2xl font-bold">Choisis un mode</h2>
+        <p class="text-slate-600">Tout est centré et prêt pour l’iPad.</p>
+      </div>
+      <div class="flex gap-2 no-print">
+        <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goHome()">🏠 Accueil</button>
+        <button class="px-4 py-2 rounded-lg bg-violet-100 text-violet-900 hover:bg-violet-200" onclick="openModal('help')">❓ Aide</button>
+        <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="openModal('vma')">ℹ️ VMA</button>
       </div>
     </div>
-    <footer>© 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      <button class="rounded-2xl p-6 text-left bg-blue-700 text-white shadow hover:shadow-lg"
+              onclick="goto('A')">
+        <h3 class="text-xl font-extrabold">À partir de la VMA et du %</h3>
+        <p class="text-white/90">Temps au tour, distance, tours, passages.</p>
+      </button>
+      <button class="rounded-2xl p-6 text-left bg-emerald-700 text-white shadow hover:shadow-lg"
+              onclick="goto('B')">
+        <h3 class="text-xl font-extrabold">À partir d’un temps/durée <span class="ml-2 inline-block text-xs px-2 py-0.5 rounded-full bg-white/20">Outil avancé</span></h3>
+        <p class="text-white/90">%VMA estimé, tours, passages.</p>
+      </button>
+      <button class="rounded-2xl p-6 text-left bg-amber-700 text-white shadow hover:shadow-lg"
+              onclick="goto('S')">
+        <h3 class="text-xl font-extrabold">🎯 Mode Séance (presets)</h3>
+        <p class="text-white/90">Cibles et passages cumulés.</p>
+      </button>
+      <button class="rounded-2xl p-6 text-left bg-violet-700 text-white shadow hover:shadow-lg"
+              onclick="goto('SP')">
+        <h3 class="text-xl font-extrabold">🛠️ Séance personnalisée</h3>
+        <p class="text-white/90">Crée ta séance + passages.</p>
+      </button>
+    </div>
   </div>
+</section>
 
-  <!-- Menu des options -->
-  <div id="menu" class="page" style="display:none">
-    <div class="wrap content" style="align-items:flex-start;justify-content:flex-start">
-      <header style="width:100%;">
-        <div>
-          <h1>Calculateur Demi-fond</h1>
-          <div class="subtitle">Choisis un mode de calcul</div>
-        </div>
-        <div class="btns no-print">
-          <button class="ghost" onclick="goHome()">🏠 Accueil</button>
-          <button class="accent" onclick="openModal('help')">❓ Aide</button>
-          <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
-        </div>
-      </header>
+<!-- APP -->
+<section id="app" class="hidden app-content p-6">
+  <div class="mx-auto max-w-6xl space-y-6">
 
-      <div class="menu-grid">
-        <div class="menu-card mc-A" onclick="goto('A')">
-          <h3>À partir de la VMA et du %</h3>
-          <div class="subtitle">Temps au tour, distance, tours, passages cumulés</div>
-        </div>
-        <div class="menu-card mc-B" onclick="goto('B')">
-          <h3>À partir d’un temps ou d’une durée <span class="tag">Outil avancé</span></h3>
-          <div class="subtitle">%VMA estimé, tours, passages cumulés</div>
-        </div>
-        <div class="menu-card mc-S" onclick="goto('S')">
-          <h3>🎯 Mode Séance (presets)</h3>
-          <div class="subtitle">Tableau cibles + passages cumulés</div>
-        </div>
-        <div class="menu-card mc-SP" onclick="goto('SP')">
-          <h3>🛠️ Séance personnalisée</h3>
-          <div class="subtitle">Crée ta séance + passages cumulés</div>
+    <!-- Header actions -->
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h2 class="text-2xl font-bold">Calculateur Demi-fond</h2>
+        <p class="text-slate-600">Tout est centré. Paramètre la piste, calcule, partage en PDF.</p>
+      </div>
+      <div class="flex gap-2 no-print">
+        <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goMenu()">⬅️ Menu</button>
+        <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="goHome()">🏠 Accueil</button>
+        <button class="px-4 py-2 rounded-lg bg-violet-100 text-violet-900 hover:bg-violet-200" onclick="openModal('help')">❓ Aide</button>
+        <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="openModal('vma')">ℹ️ VMA</button>
+        <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="exportPDF()">🧾 Partager en PDF</button>
+      </div>
+    </div>
+
+    <!-- Paramètres globaux -->
+    <div class="rounded-2xl bg-white shadow p-5">
+      <h3 class="font-semibold text-lg mb-3">⚙️ Paramètres généraux</h3>
+      <div class="grid sm:grid-cols-3 gap-4">
+        <label class="block">
+          <span class="text-sm text-slate-600">Distance d’un tour (m)</span>
+          <input id="lapGlobal" type="number" min="50" step="1" value="253"
+                 oninput="syncLap()"
+                 class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg">
+        </label>
+        <div class="sm:col-span-2 flex items-end text-slate-500">
+          S’applique à tous les modes (A, B, Séance, Perso).
         </div>
       </div>
     </div>
-    <footer>© 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB</footer>
-  </div>
 
-  <!-- Application -->
-  <div id="app" class="page" style="display:none">
-    <div class="wrap content" style="align-items:flex-start;justify-content:flex-start">
-      <header class="app-header" style="width:100%;">
-        <div>
-          <h1>Calculateur Demi-fond</h1>
-          <div class="subtitle">Piste personnalisée (ex. 253 m) • Allure à %VMA • Tours, temps au tour, distances</div>
-        </div>
-        <div class="btns no-print">
-          <button class="ghost" onclick="goMenu()">⬅️ Menu</button>
-          <button class="ghost" onclick="goHome()">🏠 Accueil</button>
-          <button class="accent" onclick="openModal('help')">❓ Aide</button>
-          <button class="accent" onclick="openModal('vma')">ℹ️ Infos VMA</button>
-          <button class="primary" onclick="exportPDF()">🧾 Partager en PDF</button>
-        </div>
-      </header>
+    <!-- Grille des blocs -->
+    <div class="grid lg:grid-cols-2 gap-6">
 
-      <!-- Paramètre global : Distance d'un tour -->
-      <section class="card" style="width:100%;margin-bottom:8px">
-        <h2>⚙️ Paramètres généraux</h2>
-        <div class="row">
-          <label for="lapGlobal">Distance d’un tour (m)</label>
-          <input id="lapGlobal" type="number" min="50" step="1" value="253" oninput="syncLap()" />
-          <div class="help">S’applique à tous les modes (A, B, Séance, Perso)</div>
-        </div>
-      </section>
+      <!-- Bloc A -->
+      <div class="rounded-2xl bg-white shadow p-5" data-page="A">
+        <h3 class="font-semibold text-lg mb-4">A. À partir de la VMA et du %</h3>
 
-      <div class="grid">
+        <div class="grid gap-4">
+          <label class="block">
+            <span class="text-sm text-slate-600">Distance d’un tour (m)</span>
+            <input id="lap" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
 
-        <!-- Bloc A : À partir de VMA & % -->
-        <section class="card half" data-page="A" style="display:none">
-          <h2>A. À partir de la VMA et du %</h2>
-          <div class="row">
-            <label for="lap">Distance d’un tour (m)</label>
-            <input id="lap" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)" />
-            <div class="help">ex. 253</div>
+          <div class="grid sm:grid-cols-3 gap-4">
+            <label class="block">
+              <span class="text-sm text-slate-600">VMA (km/h)</span>
+              <input id="vma" type="number" min="6" max="25" step="0.1" value="12"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">Intensité (% VMA)</span>
+              <input id="pct" type="number" min="50" max="110" step="1" value="80"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">Durée (min)</span>
+              <input id="dur" type="number" min="1" step="1" value="15"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
           </div>
-          <div class="row">
-            <label for="vma">VMA (km/h)</label>
-            <input id="vma" type="number" min="6" max="25" step="0.1" value="12" />
-            <div class="help">VMA mesurée (Luc Léger, VAMEVAL…)</div>
+
+          <div class="flex flex-wrap gap-2">
+            <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(12)">12 min</button>
+            <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(15)">15 min</button>
+            <button class="px-3 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="setDur(20)">20 min</button>
           </div>
-          <div class="row">
-            <label for="pct">Intensité (% VMA)</label>
-            <input id="pct" type="number" min="50" max="110" step="1" value="80" />
-            <div class="help">Généralement 70–90 %</div>
+
+          <div class="flex flex-wrap gap-2">
+            <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="calcFromVMA()">Calculer</button>
+            <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('A')">Passages cumulés</button>
+            <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetA()">Réinitialiser</button>
           </div>
-          <div class="row">
-            <label for="dur">Durée de l’effort (min)</label>
-            <input id="dur" type="number" min="1" step="1" value="15" />
-            <div class="btns">
-              <button class="ghost" onclick="setDur(12)">12 min</button>
-              <button class="ghost" onclick="setDur(15)">15 min</button>
-              <button class="ghost" onclick="setDur(20)">20 min</button>
+
+          <div id="outA" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm"></div>
+
+          <div id="recapA" class="hidden rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <h4 class="font-semibold mb-2">Récapitulatif</h4>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div class="rounded-lg bg-white border p-3 text-center">
+                <div class="text-slate-500 text-xs">Allure (m/min)</div><div id="k1" class="text-lg font-bold">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-3 text-center">
+                <div class="text-slate-500 text-xs">Allure (km/h)</div><div id="k2" class="text-lg font-bold">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-3 text-center">
+                <div class="text-slate-500 text-xs">Temps au tour</div><div id="k3" class="text-lg font-bold">—</div>
+              </div>
+              <div class="rounded-lg bg-white border p-3 text-center">
+                <div class="text-slate-500 text-xs">Tours (durée)</div><div id="k4" class="text-lg font-bold">—</div>
+              </div>
             </div>
           </div>
-          <div class="btns">
-            <button class="primary" onclick="calcFromVMA()">Calculer</button>
-            <button class="accent" onclick="buildPassages('A')">Passages cumulés</button>
-            <button class="danger" onclick="resetA()">Réinitialiser</button>
-            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-          </div>
-          <div id="outA" class="out" hidden></div>
-          <div id="passA" class="out" hidden></div>
-          <div id="recapA" class="recap" hidden>
-            <h3>Récapitulatif</h3>
-            <div class="kpi">
-              <div><span>Allure (m/min)</span><h3 id="k1">—</h3></div>
-              <div><span>Allure (km/h)</span><h3 id="k2">—</h3></div>
-              <div><span>Temps au tour</span><h3 id="k3">—</h3></div>
-              <div><span>Tours sur la durée</span><h3 id="k4">—</h3></div>
-            </div>
-          </div>
-        </section>
 
-        <!-- Bloc B : À partir d’un temps/durée -->
-        <section class="card half" data-page="B" style="display:none">
-          <h2>B. À partir d’un temps ou d’une durée <span class="tag">Outil avancé</span></h2>
-          <div class="row">
-            <label for="lap2">Distance d’un tour (m)</label>
-            <input id="lap2" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)" />
-            <div class="help">ex. 253</div>
+          <div id="passA" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        </div>
+      </div>
+
+      <!-- Bloc B -->
+      <div class="rounded-2xl bg-white shadow p-5" data-page="B">
+        <h3 class="font-semibold text-lg mb-4">B. À partir d’un temps/durée <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-100">Outil avancé</span></h3>
+
+        <div class="grid gap-4">
+          <label class="block">
+            <span class="text-sm text-slate-600">Distance d’un tour (m)</span>
+            <input id="lap2" type="number" min="50" step="1" value="253" oninput="syncLapFromLocal(this.value)"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
+
+          <div class="grid sm:grid-cols-3 gap-4">
+            <label class="block">
+              <span class="text-sm text-slate-600">VMA (km/h)</span>
+              <input id="vma2" type="number" min="6" max="25" step="0.1" value="12"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">Temps au tour (mm:ss)</span>
+              <input id="lapTime" type="text" placeholder="01:40"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">Durée totale (min)</span>
+              <input id="dur2" type="number" min="1" step="1" value="15"
+                class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+            </label>
           </div>
-          <div class="row">
-            <label for="vma2">VMA (km/h)</label>
-            <input id="vma2" type="number" min="6" max="25" step="0.1" value="12" />
-            <div class="help">Pour estimer le %VMA</div>
+
+          <div class="flex flex-wrap gap-2">
+            <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="calcFromTime()">Calculer</button>
+            <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('B')">Passages cumulés</button>
+            <button class="px-4 py-2 rounded-lg bg-rose-100 text-rose-900 hover:bg-rose-200" onclick="resetB()">Réinitialiser</button>
           </div>
-          <div class="row">
-            <label for="lapTime">Temps au tour (mm:ss)</label>
-            <input id="lapTime" type="text" placeholder="01:40" />
-            <div class="help">Option 1 : indique un temps au tour</div>
-          </div>
-          <div class="row">
-            <label for="dur2">Durée totale (min)</label>
-            <input id="dur2" type="number" min="1" step="1" value="15" />
-            <div class="help">Option 2 : indique une durée pour obtenir le nombre de tours</div>
-          </div>
-          <div class="btns">
-            <button class="primary" onclick="calcFromTime()">Calculer</button>
-            <button class="accent" onclick="buildPassages('B')">Passages cumulés</button>
-            <button class="danger" onclick="resetB()">Réinitialiser</button>
-            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-          </div>
-          <div id="outB" class="out" hidden></div>
-          <div id="passB" class="out" hidden></div>
-          <div id="recapB" class="recap" hidden>
-            <h3>Récapitulatif</h3>
+
+          <div id="outB" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm"></div>
+          <div id="recapB" class="hidden rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <h4 class="font-semibold mb-2">Récapitulatif</h4>
             <div id="recapBContent">—</div>
           </div>
-        </section>
+          <div id="passB" class="hidden rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        </div>
+      </div>
 
-        <!-- Bloc S : Mode Séance (presets) -->
-        <section class="card" data-page="S" style="display:none">
-          <h2>🎯 Mode Séance (presets)</h2>
-          <div class="row" style="grid-template-columns:220px 1fr 340px">
-            <label for="preset">Choisir une séance type</label>
-            <select id="preset">
+      <!-- Bloc S -->
+      <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="S">
+        <h3 class="font-semibold text-lg mb-4">🎯 Mode Séance (presets)</h3>
+        <div class="grid sm:grid-cols-3 gap-4 items-end">
+          <label class="block sm:col-span-2">
+            <span class="text-sm text-slate-600">Choisir une séance type</span>
+            <select id="preset" class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
               <option value="">— Sélectionne —</option>
               <option value="2x6-80-3">2 × 6' @80% (récup 3')</option>
               <option value="3x6-85-3">3 × 6' @85% (récup 3')</option>
@@ -264,418 +236,356 @@
               <option value="15x1-80-0">15' projet @80%</option>
               <option value="20x1-80-0">20' projet @80%</option>
             </select>
-            <div class="btns">
-              <button class="primary" onclick="buildSession()">Générer cibles</button>
-              <button class="ghost" onclick="applyToInputs()">🔁 Appliquer aux champs</button>
-              <button class="accent" onclick="buildPassages('S')">Passages cumulés</button>
-            </div>
+          </label>
+          <div class="flex gap-2">
+            <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="buildSession()">Générer cibles</button>
+            <button class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="applyToInputs()">🔁 Appliquer aux champs</button>
+            <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('S')">Passages</button>
           </div>
-          <div id="outS" class="out" hidden></div>
-          <div id="passS" class="out" hidden></div>
-        </section>
-
-        <!-- Bloc SP : Séance personnalisée -->
-        <section class="card" data-page="SP" style="display:none">
-          <h2>🛠️ Séance personnalisée</h2>
-          <div class="row" style="grid-template-columns:200px repeat(3,1fr)">
-            <label for="repCount">Répétitions × durée (min)</label>
-            <input id="repCount" type="number" min="1" step="1" value="3" />
-            <input id="repMin" type="number" min="1" step="1" value="6" />
-            <div class="help">ex. 3 × 6'</div>
-          </div>
-          <div class="row">
-            <label for="pctP">Intensité (% VMA)</label>
-            <input id="pctP" type="number" min="50" max="110" step="1" value="80" />
-            <div class="help">généralement 70–90 %</div>
-          </div>
-          <div class="row">
-            <label for="recP">Récupération (min)</label>
-            <input id="recP" type="number" min="0" step="0.5" value="3" />
-            <div class="help">entre les répétitions</div>
-          </div>
-          <div class="btns">
-            <button class="primary" onclick="buildCustom()">Calculer la séance</button>
-            <button class="accent" onclick="buildPassages('SP')">Passages cumulés</button>
-            <button class="ghost" onclick="goMenu()">⬅️ Retour menu</button>
-          </div>
-          <div id="outSP" class="out" hidden></div>
-          <div id="passSP" class="out" hidden></div>
-        </section>
-
+        </div>
+        <div id="outS" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        <div id="passS" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
       </div>
+
+      <!-- Bloc SP -->
+      <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="SP">
+        <h3 class="font-semibold text-lg mb-4">🛠️ Séance personnalisée</h3>
+        <div class="grid sm:grid-cols-4 gap-4">
+          <label class="block">
+            <span class="text-sm text-slate-600">Répétitions</span>
+            <input id="repCount" type="number" min="1" step="1" value="3"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-600">Durée (min)</span>
+            <input id="repMin" type="number" min="1" step="1" value="6"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-600">%VMA</span>
+            <input id="pctP" type="number" min="50" max="110" step="1" value="80"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-600">Récup (min)</span>
+            <input id="recP" type="number" min="0" step="0.5" value="3"
+              class="mt-1 w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 text-lg">
+          </label>
+        </div>
+        <div class="mt-4 flex gap-2">
+          <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" onclick="buildCustom()">Calculer</button>
+          <button class="px-4 py-2 rounded-lg bg-emerald-100 text-emerald-900 hover:bg-emerald-200" onclick="buildPassages('SP')">Passages</button>
+        </div>
+        <div id="outSP" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+        <div id="passSP" class="hidden mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"></div>
+      </div>
+
     </div>
-
-    <footer>
-      © 2025 • Calculateur Demi-fond – Équipe EPS Lycée Vauban Luxembourg – JB
-    </footer>
   </div>
+</section>
 
-  <!-- Modale AIDE -->
-  <div id="modal-help" class="modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
-    <div class="box">
-      <button class="close no-print" onclick="closeModal('help')">✕</button>
-      <h3 id="help-title">Aide — Comment utiliser l’application</h3>
-      <ol style="line-height:1.6;color:#334155;margin:0;padding-left:18px">
-        <li><b>Démarre</b>, choisis un <b>mode</b> (VMA & %, Temps/Durée, Séance, Perso).</li>
-        <li>Règle la <b>Distance d’un tour</b> (ex. 253 m) — s’applique partout.</li>
-        <li>Entre la <b>VMA</b> et le <b>%</b> (ou un <b>temps au tour</b> en mode avancé).</li>
-        <li>Appuie sur <b>Calculer</b> puis sur <b>Passages cumulés</b> pour la table des temps.</li>
-        <li>Utilise <b>Partager en PDF</b> pour envoyer aux élèves (AirDrop/Mail/Teams).</li>
-      </ol>
-      <p class="help" style="margin-top:8px">Astuce : le bloc “Temps ou durée” est utile si tu connais un <i>temps au tour</i> mais pas le %VMA.</p>
+<!-- FOOTER -->
+<footer class="py-4 text-center text-xs text-slate-500">
+  © 2025 • Calculateur Demi-fond — Équipe EPS Lycée Vauban – Luxembourg – JB
+</footer>
+
+<!-- MODALES -->
+<div id="modal-help" class="hidden fixed inset-0 bg-black/50 p-4 z-50">
+  <div class="mx-auto max-w-2xl bg-white rounded-2xl p-5">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-lg font-semibold">Aide — Comment utiliser l’appli</h3>
+      <button class="px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="closeModal('help')">✕</button>
     </div>
+    <ol class="list-decimal ml-5 space-y-1 text-slate-700">
+      <li>Appuie sur <b>Démarrer</b>, choisis un <b>mode</b>.</li>
+      <li>Règle la <b>Distance d’un tour</b> (ex. 253 m) — s’applique partout.</li>
+      <li><b>VMA &amp; %</b> : calcule allure, temps au tour, tours, passages.</li>
+      <li><b>Temps/Durée (avancé)</b> : utile si tu connais un <i>temps au tour</i> mais pas le %VMA.</li>
+      <li><b>Partager en PDF</b> → AirDrop / Mail / Teams depuis l’iPad.</li>
+    </ol>
   </div>
+</div>
 
-  <!-- Modale INFO VMA -->
-  <div id="modal-vma" class="modal" role="dialog" aria-modal="true" aria-labelledby="vma-title">
-    <div class="box">
-      <button class="close no-print" onclick="closeModal('vma')">✕</button>
-      <h3 id="vma-title">Infos VMA — Explications simples, puis pour aller plus loin</h3>
-      <h4>🔹 Version simple</h4>
-      <p style="margin:6px 0 10px;color:#334155;line-height:1.6">
-        La <b>VMA</b> (Vitesse Maximale Aérobie) est la vitesse de course maximale qu’on peut tenir environ <b>5–7 minutes</b>.
-        En cours d’EPS, on s’en sert pour fixer des <b>allures de travail</b> (par ex. courir à 80% de sa VMA).
-      </p>
-      <ul style="margin:0 0 12px 18px;color:#334155;line-height:1.6">
-        <li>Ex. VMA = 12 km/h → 80% = 9,6 km/h → ~<b>2′38″</b> au tour de 253 m.</li>
-        <li>Vitesse (km/h) → m/min : multiplie par <b>1000/60</b> ; m/s : multiplie par <b>1000/3600</b>.</li>
+<div id="modal-vma" class="hidden fixed inset-0 bg-black/50 p-4 z-50">
+  <div class="mx-auto max-w-2xl bg-white rounded-2xl p-5 space-y-3">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold">Infos VMA</h3>
+      <button class="px-3 py-1 rounded-lg bg-slate-200 hover:bg-slate-300" onclick="closeModal('vma')">✕</button>
+    </div>
+    <div>
+      <h4 class="font-semibold">🔹 Version simple</h4>
+      <p class="text-slate-700">La <b>VMA</b> (Vitesse Maximale Aérobie) ≈ vitesse max tenable ~<b>5–7 min</b>. On l’utilise pour fixer les <b>allures</b> (ex. 80% VMA).</p>
+      <ul class="list-disc ml-6 text-slate-700">
+        <li>Ex. VMA 12 km/h → 80% = 9,6 km/h → ~<b>2′38″</b> au tour de 253 m.</li>
+        <li>km/h → m/min : × 16,67 • km/h → m/s : × 0,2778.</li>
       </ul>
-      <h4>🔸 Pour aller plus loin (scientifique)</h4>
-      <p style="margin:6px 0 0;color:#334155;line-height:1.6">
-        La VMA est liée à la <b>VO₂max</b> (consommation maximale d’oxygène). On l’estime via des tests (Luc Léger, VAMEVAL…).
-        L’allure à %VMA suppose un <b>coût énergétique</b> stable et une <b>cinétique</b> d’oxygénation suffisante ; les durées ciblées (4′ à 20′)
-        orientent le type d’adaptation (cardio, économie de course, tolérance lactique).
-      </p>
+    </div>
+    <div>
+      <h4 class="font-semibold">🔸 Pour aller plus loin</h4>
+      <p class="text-slate-700">La VMA est liée à la <b>VO₂max</b>. Elle s’estime via Luc Léger, VAMEVAL… %VMA module la charge selon objectifs (4′ à 20′ : cardio, économie, tolérance lactique).</p>
     </div>
   </div>
+</div>
 
 <script>
-  // ----- Nav
-  function startApp(){
-    document.getElementById('home').style.display = 'none';
-    document.getElementById('menu').style.display = 'block';
-  }
+  // Navigation
+  function startApp(){ show('menu'); }
   function goto(code){
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-    document.querySelectorAll('[data-page]').forEach(el=>el.style.display='none');
-    const map = {A:'[data-page="A"]',B:'[data-page="B"]',S:'[data-page="S"]',SP:'[data-page="SP"]'};
-    const sel = map[code]||map['A'];
-    const el = document.querySelector(sel);
-    if(el){ el.style.display = 'block'; window.scrollTo({top:0,behavior:'smooth'}); }
+    show('app');
+    document.querySelectorAll('[data-page]').forEach(el=>el.classList.add('hidden'));
+    const map={A:'[data-page="A"]',B:'[data-page="B"]',S:'[data-page="S"]',SP:'[data-page="SP"]'};
+    const el=document.querySelector(map[code]||map.A); if(el) el.classList.remove('hidden'); window.scrollTo({top:0,behavior:'smooth'});
   }
-  function goMenu(){
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('menu').style.display = 'block';
-  }
-  function goHome(){
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('home').style.display = 'block';
+  function goHome(){ show('home'); }
+  function goMenu(){ show('menu'); }
+  function show(id){
+    ['home','menu','app'].forEach(x=>document.getElementById(x).classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
   }
 
-  // ----- Modales
-  function openModal(which){
-    const id = which==='help' ? 'modal-help' : 'modal-vma';
-    document.getElementById(id).style.display='flex';
-  }
-  function closeModal(which){
-    const id = which==='help' ? 'modal-help' : 'modal-vma';
-    document.getElementById(id).style.display='none';
-  }
-  window.addEventListener('keydown', e=>{
-    if(e.key==='Escape'){ document.querySelectorAll('.modal').forEach(m=>m.style.display='none'); }
-  });
+  // Modales
+  function openModal(w){ document.getElementById('modal-'+w).classList.remove('hidden'); }
+  function closeModal(w){ document.getElementById('modal-'+w).classList.add('hidden'); }
+  window.addEventListener('keydown',e=>{ if(e.key==='Escape'){ ['help','vma'].forEach(closeModal) } });
 
-  // ----- Utils
-  const toSeconds = (mmss) => {
-    if(!mmss) return NaN;
-    const parts = mmss.split(":").map(Number);
-    if(parts.length === 1) return parts[0];
-    if(parts.length === 2) return parts[0]*60 + parts[1];
-    return NaN;
-  };
-  const toMMSS = (sec) => {
-    if(!isFinite(sec) || sec<=0) return "—";
-    const m = Math.floor(sec/60);
-    const s = Math.round(sec%60);
-    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
-  };
-  const round = (x, d=2) => Number.isFinite(x) ? Number(x.toFixed(d)) : NaN;
-  function setDur(val){ document.getElementById('dur').value = val; }
+  // Utils
+  const toSeconds=(t)=>{ if(!t) return NaN; const p=t.split(':').map(Number); if(p.length===2)return p[0]*60+p[1]; if(p.length===1)return p[0]; return NaN; }
+  const toMMSS=(s)=>{ if(!isFinite(s)||s<=0) return '—'; const m=Math.floor(s/60), ss=Math.round(s%60); return `${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`; }
+  const round=(x,d=2)=>Number.isFinite(x)?Number(x.toFixed(d)):NaN;
+  function setDur(v){ document.getElementById('dur').value=v; }
 
-  // ----- Paramètre global de piste
+  // Piste globale
   function syncLap(){
-    const v = parseFloat(document.getElementById('lapGlobal').value)||253;
-    ['lap','lap2'].forEach(id=>{
-      const el=document.getElementById(id);
-      if(el) el.value = v;
-    });
+    const v=parseFloat(document.getElementById('lapGlobal').value)||253;
+    ['lap','lap2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=v; });
   }
   function syncLapFromLocal(val){
-    const v = parseFloat(val)||253;
-    const g = document.getElementById('lapGlobal');
-    if(g && g.value!=v) g.value = v;
-    syncLap(); // propage
+    const v=parseFloat(val)||253;
+    const g=document.getElementById('lapGlobal'); if(g && g.value!=v) g.value=v;
+    syncLap();
   }
 
-  // ----- Bloc A – VMA & %
+  // Bloc A
   function calcFromVMA(){
-    const lap = parseFloat(document.getElementById('lap').value);
-    const vma = parseFloat(document.getElementById('vma').value);
-    const pct = parseFloat(document.getElementById('pct').value);
-    const dur = parseFloat(document.getElementById('dur').value);
-    if(!lap || !vma || !pct || !dur){ alert('Complète tous les champs.'); return; }
+    const lap=+document.getElementById('lap').value;
+    const vma=+document.getElementById('vma').value;
+    const pct=+document.getElementById('pct').value;
+    const dur=+document.getElementById('dur').value;
+    if(!lap||!vma||!pct||!dur){ alert('Complète tous les champs.'); return; }
 
-    const v_kmh = vma * (pct/100);
-    const v_mps = v_kmh * 1000 / 3600; // m/s
-    const v_mpm = v_kmh * 1000 / 60;   // m/min
+    const v_kmh=vma*(pct/100);
+    const v_mps=v_kmh*1000/3600;
+    const v_mpm=v_kmh*1000/60;
 
-    const lapTime_s = lap / v_mps;      // s
-    const totalDist = v_mpm * dur;      // m
-    const laps = totalDist / lap;       // nb
+    const lapTime_s=lap/v_mps;
+    const totalDist=v_mpm*dur;
+    const laps=totalDist/lap;
 
-    const out = document.getElementById('outA');
-    out.hidden = false;
-    out.innerHTML = `
+    const out=document.getElementById('outA');
+    out.classList.remove('hidden');
+    out.innerHTML=`
       <div><b>Vitesse à ${pct}%VMA :</b> ${round(v_kmh,2)} km/h • ${round(v_mpm,1)} m/min</div>
       <div><b>Temps au tour (${lap} m) :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s)</div>
       <div><b>En ${dur} min :</b> ${Math.round(totalDist)} m • ≈ ${round(laps,2)} tours</div>
     `;
 
-    document.getElementById('k1').textContent = `${round(v_mpm,1)} m/min`;
-    document.getElementById('k2').textContent = `${round(v_kmh,2)} km/h`;
-    document.getElementById('k3').textContent = toMMSS(lapTime_s);
-    document.getElementById('k4').textContent = `${round(laps,2)} tours`;
-    document.getElementById('recapA').hidden = false;
+    document.getElementById('k1').textContent=`${round(v_mpm,1)} m/min`;
+    document.getElementById('k2').textContent=`${round(v_kmh,2)} km/h`;
+    document.getElementById('k3').textContent=toMMSS(lapTime_s);
+    document.getElementById('k4').textContent=`${round(laps,2)} tours`;
+    document.getElementById('recapA').classList.remove('hidden');
   }
   function resetA(){
-    document.getElementById('lap').value = document.getElementById('lapGlobal').value || 253;
-    document.getElementById('vma').value = 12;
-    document.getElementById('pct').value = 80;
-    document.getElementById('dur').value = 15;
-    document.getElementById('outA').hidden = true;
-    document.getElementById('recapA').hidden = true;
-    document.getElementById('passA').hidden = true;
+    document.getElementById('lap').value=document.getElementById('lapGlobal').value||253;
+    document.getElementById('vma').value=12;
+    document.getElementById('pct').value=80;
+    document.getElementById('dur').value=15;
+    document.getElementById('outA').classList.add('hidden');
+    document.getElementById('recapA').classList.add('hidden');
+    document.getElementById('passA').classList.add('hidden');
   }
 
-  // ----- Bloc B – Temps ou durée
+  // Bloc B
   function calcFromTime(){
-    const lap = parseFloat(document.getElementById('lap2').value);
-    const vma = parseFloat(document.getElementById('vma2').value);
-    const lapTimeTxt = document.getElementById('lapTime').value.trim();
-    const dur = parseFloat(document.getElementById('dur2').value);
-    if(!lap || !vma){ alert('Renseigne distance de tour et VMA.'); return; }
+    const lap=+document.getElementById('lap2').value;
+    const vma=+document.getElementById('vma2').value;
+    const lapTimeTxt=document.getElementById('lapTime').value.trim();
+    const dur=+document.getElementById('dur2').value;
+    if(!lap||!vma){ alert('Renseigne distance de tour et VMA.'); return; }
 
-    let html = '';
+    let html='';
     if(lapTimeTxt){
-      const lapTime_s = toSeconds(lapTimeTxt);
-      if(!isFinite(lapTime_s)){ alert('Temps au tour invalide. Format mm:ss'); return; }
-      const v_mps = lap / lapTime_s;
-      const v_kmh = v_mps * 3.6;
-      const pct = (v_kmh / vma) * 100;
-      html += `<div><b>Allure mesurée :</b> ${round(v_kmh,2)} km/h • ${round(v_mps*60,1)} m/min • ≈ ${round(pct,1)}% VMA</div>`;
+      const lapS=toSeconds(lapTimeTxt);
+      if(!isFinite(lapS)){ alert('Temps au tour invalide (mm:ss).'); return; }
+      const v_mps=lap/lapS, v_kmh=v_mps*3.6, pct=(v_kmh/vma)*100;
+      html+=`<div><b>Allure mesurée :</b> ${round(v_kmh,2)} km/h • ${round(v_mps*60,1)} m/min • ≈ ${round(pct,1)}% VMA</div>`;
     }
     if(dur){
-      const pctList = [70,80,90];
-      html += `<div style="margin-top:6px"><b>Tours à réaliser en ${dur} min :</b></div>`;
-      html += '<ul style="margin:6px 0 0 18px">';
+      const pctList=[70,80,90];
+      html+=`<div class="mt-2"><b>Tours à réaliser en ${dur} min :</b></div><ul class="list-disc ml-6">`;
       pctList.forEach(p=>{
-        const v_kmh = vma * (p/100);
-        const v_mpm = v_kmh * 1000 / 60;
-        const dist = v_mpm * dur;
-        const laps = dist / lap;
-        html += `<li>${p}% VMA → ${Math.round(dist)} m • ≈ ${round(laps,2)} tours</li>`;
+        const v_kmh=vma*(p/100), v_mpm=v_kmh*1000/60;
+        const dist=v_mpm*dur, laps=dist/lap;
+        html+=`<li>${p}% VMA → ${Math.round(dist)} m • ≈ ${round(laps,2)} tours</li>`;
       });
-      html += '</ul>';
+      html+='</ul>';
     }
-    if(!html){ html = '<div>Aucun calcul : indique au moins un temps au tour ou une durée.</div>'; }
+    if(!html){ html='<div>Aucun calcul : indique au moins un temps au tour ou une durée.</div>'; }
 
-    const out = document.getElementById('outB');
-    out.hidden = false;
-    out.innerHTML = html;
-    document.getElementById('recapBContent').innerHTML = html;
-    document.getElementById('recapB').hidden = false;
+    const out=document.getElementById('outB');
+    out.classList.remove('hidden'); out.innerHTML=html;
+    const r=document.getElementById('recapB'); r.classList.remove('hidden');
+    document.getElementById('recapBContent').innerHTML=html;
   }
   function resetB(){
-    document.getElementById('lap2').value = document.getElementById('lapGlobal').value || 253;
-    document.getElementById('vma2').value = 12;
-    document.getElementById('lapTime').value = '';
-    document.getElementById('dur2').value = 15;
-    document.getElementById('outB').hidden = true;
-    document.getElementById('recapB').hidden = true;
-    document.getElementById('passB').hidden = true;
+    document.getElementById('lap2').value=document.getElementById('lapGlobal').value||253;
+    document.getElementById('vma2').value=12;
+    document.getElementById('lapTime').value='';
+    document.getElementById('dur2').value=15;
+    document.getElementById('outB').classList.add('hidden');
+    document.getElementById('recapB').classList.add('hidden');
+    document.getElementById('passB').classList.add('hidden');
   }
 
-  // ----- Presets séance
+  // Presets
   function parsePreset(code){
     if(!code) return null;
-    const [left, right] = code.split('-');
-    const reps = Number(left.split('x')[0]);
-    const repMin = Number(left.split('x')[1]);
-    const pct = Number(right.split('-')[0] || right);
-    const rec = Number(right.split('-')[1] || 0);
-    return {reps, repMin, pct, rec};
+    const [left,right]=code.split('-');
+    const reps=+left.split('x')[0];
+    const repMin=+left.split('x')[1];
+    const pct=+(right.split('-')[0]||right);
+    const rec=+(right.split('-')[1]||0);
+    return {reps,repMin,pct,rec};
   }
   function buildSession(){
-    const sel = document.getElementById('preset').value;
+    const sel=document.getElementById('preset').value;
     if(!sel){ alert('Choisis une séance.'); return; }
-    const preset = parsePreset(sel);
-    const lap = parseFloat(document.getElementById('lap').value) || 253; // global déjà synchronisé
-    const vma = parseFloat(document.getElementById('vma').value) || 12;
-    const v_kmh = vma * (preset.pct/100);
-    const v_mps = v_kmh * 1000 / 3600;
-    const v_mpm = v_kmh * 1000 / 60;
+    const p=parsePreset(sel);
+    const lap=+document.getElementById('lap').value||253;
+    const vma=+document.getElementById('vma').value||12;
+    const v_kmh=vma*(p.pct/100), v_mps=v_kmh*1000/3600, v_mpm=v_kmh*1000/60;
 
-    let rows = '';
-    let totalDist = 0;
-    for(let i=1;i<=preset.reps;i++){
-      const dist = v_mpm * preset.repMin;
-      const laps = dist / lap;
-      const lapTime_s = lap / v_mps;
-      totalDist += dist;
-      rows += `<tr><td>${i}</td><td>${preset.repMin}'</td><td>${preset.pct}%</td><td>${Math.round(dist)} m</td><td>${round(laps,2)}</td><td>${toMMSS(lapTime_s)}</td></tr>`;
+    let rows='', totalDist=0;
+    for(let i=1;i<=p.reps;i++){
+      const dist=v_mpm*p.repMin, laps=dist/lap, lapS=lap/v_mps;
+      totalDist+=dist;
+      rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${p.repMin}'</td><td class="p-2">${p.pct}%</td><td class="p-2">${Math.round(dist)} m</td><td class="p-2">${round(laps,2)}</td><td class="p-2">${toMMSS(lapS)}</td></tr>`;
     }
-    const totalLaps = totalDist / lap;
-    const lapTime_s = lap / v_mps;
+    const totalLaps=totalDist/lap, lapS=lap/v_mps;
 
-    const html = `
-      <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${preset.reps} × ${preset.repMin}' @ ${preset.pct}% (récup ${preset.rec||0}')
-      <br><b>Temps au tour conseillé :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s)</div>
-      <div style="margin-top:8px;overflow:auto">
-        <table>
-          <thead><tr><th>Répétition</th><th>Durée</th><th>%VMA</th><th>Distance</th><th>Tours</th><th>Temps/tour</th></tr></thead>
+    const html=`
+      <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${p.reps} × ${p.repMin}' @ ${p.pct}% (récup ${p.rec||0}')<br>
+      <b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s)</div>
+      <div class="overflow-auto mt-3">
+        <table class="w-full border text-sm">
+          <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
-          <tfoot><tr><th colspan="3">Total</th><th>${Math.round(totalDist)} m</th><th>${round(totalLaps,2)}</th><th>—</th></tr></tfoot>
+          <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
         </table>
       </div>`;
-
-    const out = document.getElementById('outS');
-    out.hidden = false;
-    out.innerHTML = html;
+    const out=document.getElementById('outS');
+    out.classList.remove('hidden'); out.innerHTML=html;
   }
   function applyToInputs(){
-    const sel = document.getElementById('preset').value;
+    const sel=document.getElementById('preset').value;
     if(!sel){ alert('Choisis une séance.'); return; }
-    const preset = parsePreset(sel);
-    document.getElementById('pct').value = preset.pct;
-    document.getElementById('dur').value = preset.repMin;
+    const p=parsePreset(sel);
+    document.getElementById('pct').value=p.pct;
+    document.getElementById('dur').value=p.repMin;
     calcFromVMA();
   }
 
-  // ----- Séance personnalisée
+  // Perso
   function buildCustom(){
-    const lap = parseFloat(document.getElementById('lap').value) || 253;
-    const vma = parseFloat(document.getElementById('vma').value) || 12;
-    const reps = parseFloat(document.getElementById('repCount').value);
-    const repMin = parseFloat(document.getElementById('repMin').value);
-    const pct = parseFloat(document.getElementById('pctP').value);
-    const rec = parseFloat(document.getElementById('recP').value) || 0;
-    if(!lap || !vma || !reps || !repMin || !pct){ alert('Complète les champs de la séance perso.'); return; }
+    const lap=+document.getElementById('lap').value||253;
+    const vma=+document.getElementById('vma').value||12;
+    const reps=+document.getElementById('repCount').value;
+    const repMin=+document.getElementById('repMin').value;
+    const pct=+document.getElementById('pctP').value;
+    const rec=+document.getElementById('recP').value||0;
+    if(!lap||!vma||!reps||!repMin||!pct){ alert('Complète la séance perso.'); return; }
 
-    const v_kmh = vma * (pct/100);
-    const v_mps = v_kmh * 1000 / 3600;
-    const v_mpm = v_kmh * 1000 / 60;
-
-    let rows = '';
-    let totalDist = 0;
+    const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600, v_mpm=v_kmh*1000/60;
+    let rows='', totalDist=0;
     for(let i=1;i<=reps;i++){
-      const dist = v_mpm * repMin;
-      const laps = dist / lap;
-      const lapTime_s = lap / v_mps;
-      totalDist += dist;
-      rows += `<tr><td>${i}</td><td>${repMin}'</td><td>${pct}%</td><td>${Math.round(dist)} m</td><td>${round(laps,2)}</td><td>${toMMSS(lapTime_s)}</td></tr>`;
+      const dist=v_mpm*repMin, laps=dist/lap, lapS=lap/v_mps;
+      totalDist+=dist;
+      rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${repMin}'</td><td class="p-2">${pct}%</td><td class="p-2">${Math.round(dist)} m</td><td class="p-2">${round(laps,2)}</td><td class="p-2">${toMMSS(lapS)}</td></tr>`;
     }
-    const totalLaps = totalDist / lap;
-    const totalTimeMin = reps*repMin + rec*(reps-1);
-    const lapTime_s = lap / v_mps;
+    const totalLaps=totalDist/lap, totalTimeMin=reps*repMin+rec*(reps-1), lapS=lap/v_mps;
 
-    const html = `
+    const html=`
       <div><b>Entrées :</b> Tour ${lap} m • VMA ${vma} km/h • ${reps} × ${repMin}' @ ${pct}% (récup ${rec}')
-      <br><b>Temps au tour conseillé :</b> ${toMMSS(lapTime_s)} (≈ ${round(lapTime_s,1)} s) • <b>Durée totale estimée :</b> ${totalTimeMin}'</div>
-      <div style="margin-top:8px;overflow:auto">
-        <table>
-          <thead><tr><th>Répétition</th><th>Durée</th><th>%VMA</th><th>Distance</th><th>Tours</th><th>Temps/tour</th></tr></thead>
+      <br><b>Temps au tour conseillé :</b> ${toMMSS(lapS)} (≈ ${round(lapS,1)} s) • <b>Durée totale :</b> ${totalTimeMin}'</div>
+      <div class="overflow-auto mt-3">
+        <table class="w-full border text-sm">
+          <thead class="bg-slate-100"><tr><th class="p-2 border">Rép</th><th class="p-2 border">Durée</th><th class="p-2 border">%VMA</th><th class="p-2 border">Distance</th><th class="p-2 border">Tours</th><th class="p-2 border">Temps/tour</th></tr></thead>
           <tbody>${rows}</tbody>
-          <tfoot><tr><th colspan="3">Total</th><th>${Math.round(totalDist)} m</th><th>${round(totalLaps,2)}</th><th>—</th></tr></tfoot>
+          <tfoot class="bg-slate-50"><tr><th class="p-2 border" colspan="3">Total</th><th class="p-2 border">${Math.round(totalDist)} m</th><th class="p-2 border">${round(totalLaps,2)}</th><th class="p-2 border">—</th></tr></tfoot>
         </table>
       </div>`;
-
-    const out = document.getElementById('outSP');
-    out.hidden = false;
-    out.innerHTML = html;
+    const out=document.getElementById('outSP');
+    out.classList.remove('hidden'); out.innerHTML=html;
   }
 
-  // ----- Passages cumulés (A, B, S, SP)
+  // Passages cumulés
   function buildPassages(kind){
     if(kind==='A'){
-      const lap = parseFloat(document.getElementById('lap').value);
-      const vma = parseFloat(document.getElementById('vma').value);
-      const pct = parseFloat(document.getElementById('pct').value);
-      const dur = parseFloat(document.getElementById('dur').value);
-      if(!lap||!vma||!pct||!dur){ alert('Complète les champs du bloc A.'); return; }
-      const v_kmh = vma*(pct/100);
-      const v_mps = v_kmh*1000/3600;
-      const lapS = lap / v_mps;
-      const totalS = dur*60;
-      const laps = Math.floor(totalS / lapS);
-      let rows='';
-      for(let i=1;i<=laps;i++) rows += `<tr><td>${i}</td><td>${toMMSS(i*lapS)}</td></tr>`;
-      const html = `<div><b>Passages cumulés</b> — Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Durée ${dur}'</div>
-      <div style="overflow:auto;margin-top:6px"><table><thead><tr><th>Tour</th><th>Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-      const box = document.getElementById('passA'); box.hidden=false; box.innerHTML=html;
+      const lap=+document.getElementById('lap').value;
+      const vma=+document.getElementById('vma').value;
+      const pct=+document.getElementById('pct').value;
+      const dur=+document.getElementById('dur').value;
+      if(!lap||!vma||!pct||!dur){ alert('Complète le bloc A.'); return; }
+      const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600;
+      const lapS=lap/v_mps, totalS=dur*60, laps=Math.floor(totalS/lapS);
+      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
+      const html=`<div><b>Passages cumulés</b> — ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto mt-2"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      const box=document.getElementById('passA'); box.classList.remove('hidden'); box.innerHTML=html;
     }
     if(kind==='B'){
-      const lap = parseFloat(document.getElementById('lap2').value);
-      const lapTimeTxt = document.getElementById('lapTime').value.trim();
-      const dur = parseFloat(document.getElementById('dur2').value);
-      if(!lap||!lapTimeTxt||!dur){ alert('Indique distance, temps au tour et durée.'); return; }
-      const lapS = toSeconds(lapTimeTxt);
-      if(!isFinite(lapS)){ alert('Temps au tour invalide (mm:ss).'); return; }
-      const totalS = dur*60;
-      const laps = Math.floor(totalS / lapS);
-      let rows='';
-      for(let i=1;i<=laps;i++) rows += `<tr><td>${i}</td><td>${toMMSS(i*lapS)}</td></tr>`;
-      const html = `<div><b>Passages cumulés</b> — Tour ${lap} m • Temps/tour ${toMMSS(lapS)} • Durée ${dur}'</div>
-      <div style="overflow:auto;margin-top:6px"><table><thead><tr><th>Tour</th><th>Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-      const box = document.getElementById('passB'); box.hidden=false; box.innerHTML=html;
+      const lap=+document.getElementById('lap2').value;
+      const t=document.getElementById('lapTime').value.trim();
+      const dur=+document.getElementById('dur2').value;
+      if(!lap||!t||!dur){ alert('Distance, temps au tour et durée requis.'); return; }
+      const lapS=toSeconds(t); if(!isFinite(lapS)){ alert('Format mm:ss'); return; }
+      const totalS=dur*60, laps=Math.floor(totalS/lapS);
+      let rows=''; for(let i=1;i<=laps;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
+      const html=`<div><b>Passages cumulés</b> — ${lap} m • ${toMMSS(lapS)} par tour • ${dur}'</div>
+      <div class="overflow-auto mt-2"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      const box=document.getElementById('passB'); box.classList.remove('hidden'); box.innerHTML=html;
     }
     if(kind==='S' || kind==='SP'){
-      const isPreset = (kind==='S');
-      const lap = parseFloat(document.getElementById('lap').value) || 253;
-      const vma = parseFloat(document.getElementById('vma').value) || 12;
+      const isPreset=(kind==='S');
+      const lap=+document.getElementById('lap').value||253;
+      const vma=+document.getElementById('vma').value||12;
       let reps, repMin, pct, rec;
       if(isPreset){
-        const code = document.getElementById('preset').value; if(!code){alert('Choisis une séance.');return;}
-        ({reps, repMin, pct, rec} = parsePreset(code));
+        const code=document.getElementById('preset').value; if(!code){alert('Choisis une séance.');return;}
+        ({reps,repMin,pct,rec}=parsePreset(code));
       } else {
-        reps = parseFloat(document.getElementById('repCount').value);
-        repMin = parseFloat(document.getElementById('repMin').value);
-        pct = parseFloat(document.getElementById('pctP').value);
-        rec = parseFloat(document.getElementById('recP').value)||0;
+        reps=+document.getElementById('repCount').value;
+        repMin=+document.getElementById('repMin').value;
+        pct=+document.getElementById('pctP').value;
+        rec=+document.getElementById('recP').value||0;
       }
-      if(!lap||!vma||!reps||!repMin||!pct){ alert('Complète les champs de séance.'); return; }
-      const v_kmh = vma*(pct/100);
-      const v_mps = v_kmh*1000/3600;
-      const lapS = lap / v_mps;
+      if(!lap||!vma||!reps||!repMin||!pct){ alert('Complète la séance.'); return; }
+      const v_kmh=vma*(pct/100), v_mps=v_kmh*1000/3600, lapS=lap/v_mps;
       let sections='';
       for(let r=1;r<=reps;r++){
-        const lapsThisRep = Math.floor((repMin*60)/lapS);
-        let rows='';
-        for(let i=1;i<=lapsThisRep;i++) rows += `<tr><td>${i}</td><td>${toMMSS(i*lapS)}</td></tr>`;
-        sections += `<h4 style="margin:8px 0 4px">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
-          <div style="overflow:auto"><table><thead><tr><th>Tour</th><th>Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+        const lapsThis=Math.floor((repMin*60)/lapS);
+        let rows=''; for(let i=1;i<=lapsThis;i++) rows+=`<tr class="border"><td class="p-2">${i}</td><td class="p-2">${toMMSS(i*lapS)}</td></tr>`;
+        sections+=`<h4 class="font-semibold mt-3">Répétition ${r} — ${repMin}' @ ${pct}%</h4>
+          <div class="overflow-auto"><table class="w-full border text-sm"><thead class="bg-slate-100"><tr><th class="p-2 border">Tour</th><th class="p-2 border">Temps cumulé</th></tr></thead><tbody>${rows}</tbody></table></div>`;
       }
-      const html = `<div><b>Passages cumulés</b> — Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
-      const id = isPreset ? 'passS' : 'passSP';
-      const box = document.getElementById(id); box.hidden=false; box.innerHTML=html;
+      const html=`<div><b>Passages cumulés</b> — Tour ${lap} m • Temps/tour cible ${toMMSS(lapS)} • Récup ${rec||0}'</div>${sections}`;
+      const id=isPreset?'passS':'passSP';
+      const box=document.getElementById(id); box.classList.remove('hidden'); box.innerHTML=html;
     }
   }
 
-  // ----- Export PDF (impression propre → iPad partage)
-  function exportPDF(){
-    window.print();
-  }
+  // Export PDF
+  function exportPDF(){ window.print(); }
 </script>
 </body>
 </html>
