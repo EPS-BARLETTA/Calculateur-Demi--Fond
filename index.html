@@ -127,11 +127,11 @@
       </div>
     </div>
 
-    <!-- Grille des blocs (centrée) -->
-    <div class="grid lg:grid-cols-2 gap-6 place-items-center">
+    <!-- Grille des blocs: colonne centrée (mobile/tablette), 2 colonnes en large -->
+    <div class="flex flex-col items-center gap-6 lg:grid lg:grid-cols-2">
 
-      <!-- Bloc A (carte centrée) -->
-      <div class="w-full max-w-2xl rounded-2xl bg-white shadow p-5" data-page="A">
+      <!-- Bloc A -->
+      <div class="max-w-2xl w-full mx-auto rounded-2xl bg-white shadow p-5" data-page="A">
         <h3 class="font-semibold text-lg mb-4 text-center">A. À partir de la VMA et du %</h3>
 
         <!-- zone paramètres centrée -->
@@ -212,8 +212,8 @@
         </div>
       </div>
 
-      <!-- Bloc B (carte centrée) -->
-      <div class="w-full max-w-2xl rounded-2xl bg-white shadow p-5" data-page="B">
+      <!-- Bloc B -->
+      <div class="max-w-2xl w-full mx-auto rounded-2xl bg-white shadow p-5" data-page="B">
         <h3 class="font-semibold text-lg mb-4 text-center">
           B. À partir d’un temps/durée
           <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-slate-100">Outil avancé</span>
@@ -277,7 +277,7 @@
         </div>
       </div>
 
-      <!-- Bloc S (séance presets) -->
+      <!-- Bloc S (presets) -->
       <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="S">
         <h3 class="font-semibold text-lg mb-4">🎯 Mode Séance (presets)</h3>
         <div class="grid sm:grid-cols-3 gap-4 items-end">
@@ -321,7 +321,7 @@
         </div>
       </div>
 
-      <!-- Bloc SP (séance perso) -->
+      <!-- Bloc SP (perso) -->
       <div class="rounded-2xl bg-white shadow p-5 lg:col-span-2" data-page="SP">
         <h3 class="font-semibold text-lg mb-4">🛠️ Séance personnalisée</h3>
         <div class="grid sm:grid-cols-4 gap-4">
@@ -716,7 +716,7 @@
     }
   }
 
-  // ------- Export / Partage avec gabarit pro (header + footer) -------
+  // ------- Export / Partage avec gabarit pro -------
   function buildExportNode(containerId, titleText){
     const source=document.getElementById(containerId);
     const clone=source.cloneNode(true);
@@ -737,10 +737,7 @@
     const footer=document.createElement('div');
     footer.className='export-footer';
     footer.innerHTML=`
-      <div class="brand">
-        <!-- <img src="logo-eps.png" alt="EPS" style="height:16px"> -->
-        ScanProf • Équipe EPS Lycée Vauban – Luxembourg – JB
-      </div>
+      <div class="brand">ScanProf • Équipe EPS Lycée Vauban – Luxembourg – JB</div>
       <div>Partage iPad (AirDrop/Mail/Teams)</div>
     `;
     frame.appendChild(footer);
